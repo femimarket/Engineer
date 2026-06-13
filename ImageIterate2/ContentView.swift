@@ -32,8 +32,12 @@ private enum Theme {
 struct Variation: Identifiable, Equatable {
     let id = UUID()
     let image: UIImage
-    /// Server-side filename (under femi.market/_upload). Lets us iterate from
-    /// this variation by reusing it as the next `image` field without re-uploading.
+    /// Original encoded bytes from MediaApi — kept alongside the decoded image
+    /// so the dismissal callback can return raw data without re-encoding.
+    let data: Data
+    /// Server-side filename. Internal-only — used to chain the next generation
+    /// server-side without re-uploading. NEVER exposed publicly; servers can't
+    /// be relied on to persist filenames indefinitely.
     let filename: String
 
     static func == (lhs: Variation, rhs: Variation) -> Bool { lhs.id == rhs.id }
@@ -41,17 +45,63 @@ struct Variation: Identifiable, Equatable {
 
 // MARK: - ContentView
 
-struct ContentView: View {
-    @State private var hero: UIImage = ContentView.makeDemoImage()
-    /// Server-side filename of the current hero. Seeded with the bundled demo
-    /// asset (which also exists on femi.market under the same name) so the first
-    /// generate can reference it directly. Replaced by each variation's `file`
-    /// as the user iterates.
-    @State private var heroFile: String? = ContentView.demoFilename
+public struct ContentView: View {
+    /// Fired once on screen dismissal (sheet swipe, parent flips binding,
+    /// programmatic dismiss). Returns the kept image as raw bytes plus its
+    /// server-side filename — both guaranteed non-nil because the screen
+    /// always has a valid hero from init onward. Filename is informational
+    /// (servers may not persist filenames indefinitely); callers should treat
+    /// the bytes as source of truth.
+    var onCommit: (_ heroData: Data, _ heroFilename: String) -> Void
+
+    @State private var hero: UIImage
+    /// Original encoded bytes of the current hero — what onCommit returns on dismiss.
+    @State private var heroData: Data
+    /// Server-side filename of the current hero. Used to chain the next
+    /// generation call and surfaced to the caller on dismiss.
+    @State private var heroFile: String
     /// Dominant warm tone of the current hero image, used to color the ambient
     /// glow and the hero drop shadow so the chrome always matches the photo.
-    @State private var heroTint: Color = ContentView.dominantColor(of: ContentView.makeDemoImage())
+    @State private var heroTint: Color
+
+    /// Path of the initial image; used by `resetToDefault` to reload from disk
+    /// without holding redundant copies in memory.
+    private let initialImagePath: String
+
+    /// Designated init.
+    /// - initialImagePath: full disk path to the starting image file. MUST point
+    ///   to a readable image — invalid paths trigger `preconditionFailure`. The
+    ///   basename is used as the internal server-side filename for the first
+    ///   generation call.
+    /// - bearer: auth token, injected once into `ApiAPIConfiguration.shared.customHeaders`.
+    ///   Source from Keychain or a server-issued session — never a literal.
+    /// - onCommit: fires once on dismiss with the kept image's raw bytes.
+    public init(
+        initialImagePath: String,
+        bearer: String,
+        onCommit: @escaping (_ heroData: Data, _ heroFilename: String) -> Void
+    ) {
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: initialImagePath)),
+              let img = UIImage(data: data) else {
+            preconditionFailure("initialImagePath does not point to a readable image: \(initialImagePath)")
+        }
+        let basename = URL(fileURLWithPath: initialImagePath).lastPathComponent
+        self.initialImagePath = initialImagePath
+        self.onCommit = onCommit
+        _hero = State(initialValue: img)
+        _heroData = State(initialValue: data)
+        _heroFile = State(initialValue: basename)
+        _heroTint = State(initialValue: ContentView.dominantColor(of: img))
+        ImageService.configure(bearer: bearer)
+    }
     @State private var history: [UIImage] = []
+    /// Original bytes of each prior hero, parallel to `history`. Lets revert
+    /// restore the exact bytes without re-encoding (PNG round-trip would lose
+    /// fidelity and risk nil for damaged UIImages).
+    @State private var historyData: [Data] = []
+    /// Server filenames of every promoted hero in order, parallel to `history`.
+    /// Internal only — drives the history strip's revert action. Not exposed.
+    @State private var historyFiles: [String] = []
     @State private var variations: [Variation] = []
     @State private var selectedVibes: Set<String> = []
     @State private var prompt: String = ""
@@ -84,7 +134,7 @@ struct ContentView: View {
         return selected.sorted().flatMap { Self.vibePalettes[$0] ?? [] }
     }
 
-    var body: some View {
+    public var body: some View {
         ZStack {
             ambientBackground
 
@@ -110,11 +160,7 @@ struct ContentView: View {
                             historyStrip
                         }
 
-                        if !variations.isEmpty || pendingPlaceholders > 0 {
-                            variationsRail
-                        } else {
-                            emptyStateRail
-                        }
+                        rail
                     }
                     .padding(.bottom, 230)
                 }
@@ -136,6 +182,11 @@ struct ContentView: View {
         .onTapGesture { promptFocused = false }
         .fullScreenCover(isPresented: $showingFullScreen) {
             FullScreenImageView(image: hero, isPresented: $showingFullScreen)
+        }
+        .onDisappear {
+            // Single dismissal hook — fires whether the parent flips its binding,
+            // the user swipes the sheet down, or the child calls `dismiss`.
+            onCommit(heroData, heroFile)
         }
     }
 
@@ -173,7 +224,7 @@ struct ContentView: View {
                     .foregroundStyle(.white.opacity(0.85))
             }
             Spacer()
-            iconButton(symbol: "arrow.counterclockwise") {
+            iconButton(symbol: "arrow.counterclockwise", accessibilityLabel: "Reset") {
                 resetToDefault()
             }
         }
@@ -181,7 +232,7 @@ struct ContentView: View {
         .padding(.bottom, 14)
     }
 
-    private func iconButton(symbol: String, action: @escaping () -> Void) -> some View {
+    private func iconButton(symbol: String, accessibilityLabel: String, action: @escaping () -> Void) -> some View {
         Button(action: action) {
             Image(systemName: symbol)
                 .font(.system(size: 13, weight: .bold))
@@ -191,6 +242,7 @@ struct ContentView: View {
                 .overlay(Circle().strokeBorder(Theme.stroke, lineWidth: 0.5))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
     }
 
     // MARK: Hero
@@ -290,28 +342,47 @@ struct ContentView: View {
         }
     }
 
-    // MARK: Variations
+    // MARK: Rail
+    //
+    // ONE rail using the same fixed-size card across every state. Empty =
+    // ghost. Generating = ghost with shimmer overlay. Loaded = same-sized
+    // card showing the real image. Card dimensions NEVER change with count
+    // or state. The horizontal ScrollView lets more variations scroll into view.
 
-    private var variationsRail: some View {
+    private var rail: some View {
         ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 14) {
+            LazyHStack(spacing: 14) {
                 Color.clear.frame(width: 8)
-                ForEach(0..<pendingPlaceholders, id: \.self) { _ in
-                    placeholderCard
-                        .transition(.opacity)
-                }
-                ForEach(variations) { v in
-                    variationCard(v)
-                        .transition(.asymmetric(
-                            insertion: .scale(scale: 0.85).combined(with: .opacity),
-                            removal: .opacity
-                        ))
+                if variations.isEmpty {
+                    ghostPlaceholder(
+                        palette: Array(activeVibeColors.prefix(2)),
+                        shimmer: pendingPlaceholders > 0
+                    )
+                    ghostPlaceholder(
+                        palette: Array(activeVibeColors.suffix(2)),
+                        label: pendingPlaceholders > 0 ? nil : "tap generate",
+                        shimmer: pendingPlaceholders > 0
+                    )
+                } else {
+                    ForEach(variations) { v in
+                        variationCard(v)
+                    }
                 }
                 Color.clear.frame(width: 8)
             }
             .padding(.horizontal, 14)
         }
+        // CRITICAL: a horizontal ScrollView inside a vertical ScrollView claims
+        // unbounded vertical space by default — which pushed the rail off the
+        // visible viewport, causing the "90% cropped" symptom. Constrain it to
+        // the card's intrinsic height so layout treats it like a fixed-height row.
+        .frame(height: 168)
     }
+
+    /// Hard ceiling on how many variations we keep in memory. Beyond this,
+    /// the oldest fall off the back when new ones generate. Bounds the worst-
+    /// case RAM footprint of the rail to ~ceiling × 4MB on 1024×1024 results.
+    private static let variationCeiling = 30
 
     private func variationCard(_ v: Variation) -> some View {
         Button { promote(v) } label: {
@@ -339,19 +410,7 @@ struct ContentView: View {
         .buttonStyle(PressableStyle(scale: 0.96))
     }
 
-    // MARK: Empty state
-
-    private var emptyStateRail: some View {
-        HStack(spacing: 14) {
-            ghostPlaceholder(palette: Array(activeVibeColors.prefix(2)))
-            ghostPlaceholder(palette: Array(activeVibeColors.suffix(2)),
-                             label: "tap generate")
-        }
-        .padding(.horizontal, 22)
-        .transition(.opacity)
-    }
-
-    private func ghostPlaceholder(palette: [Color], label: String? = nil) -> some View {
+    private func ghostPlaceholder(palette: [Color], label: String? = nil, shimmer: Bool = false) -> some View {
         let colors = palette.isEmpty ? [Color.white.opacity(0.15), Color.white.opacity(0.05)] : palette
         return ZStack {
             RoundedRectangle(cornerRadius: 22, style: .continuous)
@@ -375,8 +434,13 @@ struct ContentView: View {
                         .foregroundStyle(.white.opacity(0.5))
                 }
             }
+            if shimmer {
+                ShimmerView()
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .allowsHitTesting(false)
+            }
         }
-        .frame(maxWidth: .infinity, minHeight: 168)
+        .frame(width: 168, height: 168)
         .animation(.easeInOut(duration: 0.4), value: colors)
     }
 
@@ -535,7 +599,10 @@ struct ContentView: View {
         let newTint = ContentView.dominantColor(of: v.image)
         withAnimation(.spring(response: 0.45, dampingFraction: 0.78)) {
             history.append(hero)
+            historyData.append(heroData)
+            historyFiles.append(heroFile)
             hero = v.image
+            heroData = v.data
             heroFile = v.filename
             heroTint = newTint
             variations.removeAll { $0.id == v.id }
@@ -546,27 +613,42 @@ struct ContentView: View {
         guard idx < history.count else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
         let restored = history[idx]
+        let restoredData = idx < historyData.count ? historyData[idx] : heroData
+        let restoredFile = idx < historyFiles.count ? historyFiles[idx] : heroFile
         let newTint = ContentView.dominantColor(of: restored)
         withAnimation(.spring(response: 0.45, dampingFraction: 0.78)) {
             history.append(hero)
+            historyData.append(heroData)
+            historyFiles.append(heroFile)
             hero = restored
-            // Restoring a prior hero — we don't track filenames per history slot,
-            // so fall back to the server default for the next generation.
-            heroFile = nil
+            heroData = restoredData
+            heroFile = restoredFile
             heroTint = newTint
             history.remove(at: idx)
+            if idx < historyData.count { historyData.remove(at: idx) }
+            if idx < historyFiles.count { historyFiles.remove(at: idx) }
         }
     }
 
     private func resetToDefault() {
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
-        let demo = ContentView.makeDemoImage()
-        let demoTint = ContentView.dominantColor(of: demo)
+        guard let data = try? Data(contentsOf: URL(fileURLWithPath: initialImagePath)),
+              let img = UIImage(data: data) else {
+            // The initial path was valid at init (we precondition'd it); if it
+            // disappeared between then and now, that's a programmer/environment
+            // bug rather than a recoverable user error.
+            preconditionFailure("initialImagePath no longer readable on reset: \(initialImagePath)")
+        }
+        let basename = URL(fileURLWithPath: initialImagePath).lastPathComponent
+        let initialTint = ContentView.dominantColor(of: img)
         withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
-            hero = demo
-            heroFile = ContentView.demoFilename
-            heroTint = demoTint
+            hero = img
+            heroData = data
+            heroFile = basename
+            heroTint = initialTint
             history.removeAll()
+            historyData.removeAll()
+            historyFiles.removeAll()
             variations.removeAll()
             selectedVibes.removeAll()
             prompt = ""
@@ -588,7 +670,7 @@ struct ContentView: View {
         }
         UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
 
-        let imageRef = heroFile ?? ""
+        let imageRef = heroFile
 
         do {
             let results = try await ImageService.shared.generate(
@@ -598,7 +680,11 @@ struct ContentView: View {
             )
             withAnimation(.spring(response: 0.55, dampingFraction: 0.82)) {
                 for r in results {
-                    variations.insert(Variation(image: r.image, filename: r.filename), at: 0)
+                    variations.insert(Variation(image: r.image, data: r.data, filename: r.filename), at: 0)
+                }
+                // Cap memory: oldest variations fall off the back.
+                if variations.count > Self.variationCeiling {
+                    variations.removeLast(variations.count - Self.variationCeiling)
                 }
                 pendingPlaceholders = 0
             }
@@ -620,24 +706,6 @@ struct ContentView: View {
         }
     }
 
-    // MARK: Demo image
-    //
-    // The bundled PNG is also a real asset on femi.market under the same name,
-    // so we can pass its filename to `image:` for the very first generation —
-    // no client upload needed.
-
-    static let demoFilename = "demoUploadSong_019e7f3d-aa21-7173-86ae-fbe8d61d0a84.png"
-
-    static func makeDemoImage() -> UIImage {
-        if let url = Bundle.main.url(forResource: demoFilename, withExtension: nil),
-           let data = try? Data(contentsOf: url),
-           let img = UIImage(data: data) {
-            return img
-        }
-        let renderer = ImageRenderer(content: DemoImageCanvas())
-        renderer.scale = 2.0
-        return renderer.uiImage ?? UIImage()
-    }
 
     /// Average color of the image, downsampled to a single pixel.
     /// Used to tint the ambient glow and hero drop shadow.
@@ -731,50 +799,19 @@ private struct PressableStyle: ButtonStyle {
 
 // MARK: - Demo image canvas (hardcoded "input" image)
 
-private struct DemoImageCanvas: View {
-    var body: some View {
-        ZStack {
-            LinearGradient(
-                colors: [
-                    Color(red: 0.05, green: 0.02, blue: 0.22),
-                    Color(red: 0.32, green: 0.06, blue: 0.48),
-                    Color(red: 0.70, green: 0.14, blue: 0.40),
-                    Color(red: 0.98, green: 0.32, blue: 0.32)
-                ],
-                startPoint: .topLeading, endPoint: .bottomTrailing
-            )
-            Circle()
-                .fill(RadialGradient(
-                    colors: [Color.white.opacity(0.55), .clear],
-                    center: .center, startRadius: 0, endRadius: 330))
-                .frame(width: 720, height: 720)
-                .offset(x: -180, y: -290)
-            Circle()
-                .fill(RadialGradient(
-                    colors: [Color(red: 1.0, green: 0.45, blue: 0.85).opacity(0.7), .clear],
-                    center: .center, startRadius: 0, endRadius: 240))
-                .frame(width: 500, height: 500)
-                .offset(x: 210, y: 250)
-            Rectangle()
-                .fill(.white.opacity(0.05))
-                .frame(height: 1)
-                .offset(y: 70)
-        }
-        .frame(width: 1024, height: 1024)
-    }
-}
-
 // MARK: - Logger
 
 @inline(__always)
-private func log(_ tag: String, _ message: String) {
+nonisolated private func log(_ tag: String, _ message: @autoclosure () -> String) {
+    #if DEBUG
     let t = Date().formatted(.dateTime.hour().minute().second().secondFraction(.fractional(3)))
-    print("⟶ \(t) \(tag) \(scrub(message))")
+    print("⟶ \(t) \(tag) \(scrub(message()))")
+    #endif
 }
 
 /// Strip base64/data-URI noise and any other base64-looking blob from log strings,
 /// so the console stays readable even when the server echoes the request back.
-private func scrub(_ s: String) -> String {
+nonisolated private func scrub(_ s: String) -> String {
     var out = s
     if let range = out.range(of: "data:image/[a-z]+;base64,", options: .regularExpression) {
         out.replaceSubrange(range.lowerBound..<out.endIndex, with: "<image-data-omitted>")
@@ -816,21 +853,28 @@ enum ImageServiceError: LocalizedError {
     }
 }
 
-final class ImageService {
+final class ImageService: @unchecked Sendable {
     static let shared = ImageService()
 
-    private let bearer    = "019ec07a-c943-7275-b758-2315b8c9fa6f"
-    private let mediaHost = "https://femi.market/"
+    private var bearer: String = ""
 
-    private init() {
-        log("INIT", "basePath=\(ApiAPIConfiguration.shared.basePath) bearer=\(bearer.prefix(8))…")
+    private init() {}
+
+    /// Injects the auth bearer at startup. Called from `ContentView.init`.
+    /// Source the bearer from Keychain or a server-issued session — never from
+    /// a literal in source code in production.
+    static func configure(bearer: String) {
+        shared.bearer = bearer
         ApiAPIConfiguration.shared.customHeaders["Authorization"] = "Bearer \(bearer)"
+        log("INIT", "basePath=\(ApiAPIConfiguration.shared.basePath) bearer=\(bearer.prefix(8))…")
     }
 
-    /// Result of a single generation: the decoded image plus its server-side filename
-    /// (so the UI can iterate on it without re-uploading).
+    /// Result of a single generation: the decoded image, the original encoded
+    /// bytes (kept so the dismissal callback can return them without re-encoding),
+    /// and the server-side filename for chaining the next iteration.
     struct GenerationResult {
         let image: UIImage
+        let data: Data
         let filename: String
     }
 
@@ -914,8 +958,8 @@ final class ImageService {
         }
 
         log("[slot \(slot)] STEP 4", "fetch result media file='\(current.file)'")
-        let img = try await fetchResultImage(reference: current.file, slot: slot)
-        return GenerationResult(image: img, filename: current.file)
+        let (img, data) = try await fetchResultImage(reference: current.file, slot: slot)
+        return GenerationResult(image: img, data: data, filename: current.file)
     }
 
     private func call(
@@ -966,25 +1010,17 @@ final class ImageService {
         }
     }
 
-    private func fetchResultImage(reference filename: String, slot: Int) async throws -> UIImage {
+    private func fetchResultImage(reference filename: String, slot: Int) async throws -> (UIImage, Data) {
         let tag = "[slot \(slot)][media]"
-        let cleaned = filename.hasPrefix("/") ? String(filename.dropFirst()) : filename
-        guard let url = URL(string: mediaHost + cleaned) else {
-            log(tag, "FAIL — couldn't form URL (filename.len=\(cleaned.count))")
-            throw ImageServiceError.decodingFailed
-        }
-        log(tag, "→ GET host=\(url.host ?? "?") path.len=\(url.path.count)")
-        var req = URLRequest(url: url)
-        req.setValue("Bearer \(bearer)", forHTTPHeaderField: "Authorization")
+        log(tag, "→ MediaApi.fetch filename.len=\(filename.count)")
         do {
-            let (data, response) = try await URLSession.shared.data(for: req)
-            let code = (response as? HTTPURLResponse)?.statusCode ?? -1
-            log(tag, "← HTTP \(code) bytes=\(data.count)")
+            let data = try await MediaApi.fetch(filename, idToken: bearer)
+            log(tag, "← bytes=\(data.count)")
             guard let img = UIImage(data: data) else {
                 log(tag, "FAIL — could not decode \(data.count) bytes as UIImage")
                 throw ImageServiceError.decodingFailed
             }
-            return img
+            return (img, data)
         } catch {
             let nsErr = error as NSError
             log(tag, "FAIL — \(nsErr.domain) \(nsErr.code): \(nsErr.localizedDescription)")
@@ -1081,6 +1117,7 @@ struct FullScreenImageView: View {
                             .background(Circle().fill(.white.opacity(0.08)))
                             .overlay(Circle().strokeBorder(.white.opacity(0.12), lineWidth: 0.5))
                     }
+                    .accessibilityLabel("Close")
                 }
                 .padding(.horizontal, 22)
                 .padding(.top, 12)
@@ -1091,6 +1128,4 @@ struct FullScreenImageView: View {
     }
 }
 
-#Preview {
-    ContentView()
-}
+

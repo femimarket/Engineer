@@ -1,0 +1,27 @@
+{
+  "object" : {
+    "artifacts" : [
+
+    ],
+    "dependencies" : [
+      {
+        "basedOn" : null,
+        "packageRef" : {
+          "identity" : "api",
+          "kind" : "fileSystem",
+          "location" : "/Users/u/swiftapps/ImageIterate2/Generated/Api",
+          "name" : "Api"
+        },
+        "state" : {
+          "name" : "fileSystem",
+          "path" : "/Users/u/swiftapps/ImageIterate2/Generated/Api"
+        },
+        "subpath" : "api"
+      }
+    ],
+    "prebuilts" : [
+
+    ]
+  },
+  "version" : 7
+}

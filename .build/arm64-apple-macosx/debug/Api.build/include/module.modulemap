@@ -1,0 +1,3 @@
+module Api {
+    header "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/include/Api-Swift.h"
+}
