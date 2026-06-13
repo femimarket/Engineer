@@ -60,9 +60,30 @@ struct ContentView: View {
     @State private var heroBreath = false
     @State private var errorBanner: String?
 
+    @State private var showingFullScreen = false
+    @State private var savedFilenames: Set<String> = []
+
     @FocusState private var promptFocused: Bool
 
     private let vibes = ["Cinematic", "Neon", "Moody", "Pastel", "Film", "Surreal", "Vintage", "Dreamy"]
+
+    /// Two-tone palette per vibe — used to color the ghost placeholders so the
+    /// user gets a live preview of what mood they're about to generate.
+    private static let vibePalettes: [String: [Color]] = [
+        "Cinematic": [Color(red: 0.13, green: 0.28, blue: 0.42), Color(red: 0.88, green: 0.58, blue: 0.28)],
+        "Neon":      [Color(red: 0.10, green: 0.80, blue: 1.00), Color(red: 1.00, green: 0.20, blue: 0.85)],
+        "Moody":     [Color(red: 0.18, green: 0.10, blue: 0.40), Color(red: 0.50, green: 0.20, blue: 0.50)],
+        "Pastel":    [Color(red: 1.00, green: 0.82, blue: 0.88), Color(red: 0.78, green: 0.80, blue: 0.96)],
+        "Film":      [Color(red: 0.72, green: 0.55, blue: 0.32), Color(red: 0.42, green: 0.28, blue: 0.18)],
+        "Surreal":   [Color(red: 0.30, green: 0.85, blue: 0.85), Color(red: 1.00, green: 0.55, blue: 0.85)],
+        "Vintage":   [Color(red: 0.65, green: 0.50, blue: 0.28), Color(red: 0.95, green: 0.85, blue: 0.62)],
+        "Dreamy":    [Color(red: 0.82, green: 0.72, blue: 1.00), Color(red: 1.00, green: 0.80, blue: 0.85)]
+    ]
+
+    private var activeVibeColors: [Color] {
+        let selected = selectedVibes.isEmpty ? Set(["Cinematic", "Dreamy"]) : selectedVibes
+        return selected.sorted().flatMap { Self.vibePalettes[$0] ?? [] }
+    }
 
     var body: some View {
         ZStack {
@@ -76,6 +97,10 @@ struct ContentView: View {
                         heroCard
                             .padding(.horizontal, 22)
                             .padding(.top, 4)
+                            .onTapGesture {
+                                UIImpactFeedbackGenerator(style: .light).impactOccurred()
+                                showingFullScreen = true
+                            }
 
                         if !history.isEmpty {
                             historyStrip
@@ -83,6 +108,8 @@ struct ContentView: View {
 
                         if !variations.isEmpty || pendingPlaceholders > 0 {
                             variationsRail
+                        } else {
+                            emptyStateRail
                         }
                     }
                     .padding(.bottom, 230)
@@ -103,6 +130,9 @@ struct ContentView: View {
         .background(Theme.bg)
         .onAppear { heroBreath = true }
         .onTapGesture { promptFocused = false }
+        .fullScreenCover(isPresented: $showingFullScreen) {
+            FullScreenImageView(image: hero, isPresented: $showingFullScreen)
+        }
     }
 
     // MARK: Background
@@ -139,7 +169,9 @@ struct ContentView: View {
                     .foregroundStyle(.white.opacity(0.85))
             }
             Spacer()
-            iconButton(symbol: "xmark") { }
+            iconButton(symbol: "arrow.counterclockwise") {
+                resetToDefault()
+            }
         }
         .padding(.horizontal, 22)
         .padding(.bottom, 14)
@@ -259,28 +291,91 @@ struct ContentView: View {
 
     private func variationCard(_ v: Variation) -> some View {
         Button { promote(v) } label: {
-            Image(uiImage: v.image)
-                .resizable()
-                .interpolation(.high)
-                .aspectRatio(contentMode: .fill)
-                .frame(width: 168, height: 168)
-                .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
-                .overlay {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .fill(LinearGradient(
-                            colors: [.white.opacity(0.16), .clear, .black.opacity(0.12)],
-                            startPoint: .top, endPoint: .bottom))
-                        .blendMode(.plusLighter)
-                        .opacity(0.7)
-                        .allowsHitTesting(false)
+            ZStack(alignment: .topTrailing) {
+                Image(uiImage: v.image)
+                    .resizable()
+                    .interpolation(.high)
+                    .aspectRatio(contentMode: .fill)
+                    .frame(width: 168, height: 168)
+                    .clipShape(RoundedRectangle(cornerRadius: 22, style: .continuous))
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .fill(LinearGradient(
+                                colors: [.white.opacity(0.16), .clear, .black.opacity(0.12)],
+                                startPoint: .top, endPoint: .bottom))
+                            .blendMode(.plusLighter)
+                            .opacity(0.7)
+                            .allowsHitTesting(false)
+                    }
+                    .overlay {
+                        RoundedRectangle(cornerRadius: 22, style: .continuous)
+                            .strokeBorder(.white.opacity(0.20), lineWidth: 0.6)
+                    }
+                if savedFilenames.contains(v.filename) {
+                    Image(systemName: "heart.fill")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white)
+                        .padding(6)
+                        .background(Circle().fill(.black.opacity(0.55)))
+                        .padding(8)
                 }
-                .overlay {
-                    RoundedRectangle(cornerRadius: 22, style: .continuous)
-                        .strokeBorder(.white.opacity(0.20), lineWidth: 0.6)
-                }
-                .shadow(color: .black.opacity(0.50), radius: 16, y: 8)
+            }
+            .shadow(color: .black.opacity(0.50), radius: 16, y: 8)
         }
         .buttonStyle(PressableStyle(scale: 0.96))
+        .contextMenu {
+            Button {
+                save(v)
+            } label: {
+                Label(savedFilenames.contains(v.filename) ? "Saved" : "Save to Photos", systemImage: "heart")
+            }
+            Button(role: .destructive) {
+                discard(v)
+            } label: {
+                Label("Discard", systemImage: "trash")
+            }
+        }
+    }
+
+    // MARK: Empty state
+
+    private var emptyStateRail: some View {
+        HStack(spacing: 14) {
+            ghostPlaceholder(palette: Array(activeVibeColors.prefix(2)))
+            ghostPlaceholder(palette: Array(activeVibeColors.suffix(2)),
+                             label: "tap generate")
+        }
+        .padding(.horizontal, 22)
+        .transition(.opacity)
+    }
+
+    private func ghostPlaceholder(palette: [Color], label: String? = nil) -> some View {
+        let colors = palette.isEmpty ? [Color.white.opacity(0.15), Color.white.opacity(0.05)] : palette
+        return ZStack {
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .fill(LinearGradient(
+                    colors: colors.map { $0.opacity(0.28) },
+                    startPoint: .topLeading, endPoint: .bottomTrailing
+                ))
+            RoundedRectangle(cornerRadius: 22, style: .continuous)
+                .strokeBorder(
+                    .white.opacity(0.10),
+                    style: StrokeStyle(lineWidth: 1, dash: [4, 6])
+                )
+            VStack(spacing: 6) {
+                Image(systemName: "sparkle")
+                    .font(.system(size: 18, weight: .light))
+                    .foregroundStyle(.white.opacity(0.55))
+                if let label {
+                    Text(label)
+                        .font(.system(size: 10, weight: .semibold))
+                        .tracking(1.2)
+                        .foregroundStyle(.white.opacity(0.5))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, minHeight: 168)
+        .animation(.easeInOut(duration: 0.4), value: colors)
     }
 
     private var placeholderCard: some View {
@@ -450,6 +545,38 @@ struct ContentView: View {
             heroFile = nil
             heroTint = newTint
             history.remove(at: idx)
+        }
+    }
+
+    private func save(_ v: Variation) {
+        UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+        UIImageWriteToSavedPhotosAlbum(v.image, nil, nil, nil)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.7)) {
+            savedFilenames.insert(v.filename)
+        }
+    }
+
+    private func discard(_ v: Variation) {
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        withAnimation(.spring(response: 0.4, dampingFraction: 0.8)) {
+            variations.removeAll { $0.id == v.id }
+        }
+    }
+
+    private func resetToDefault() {
+        UIImpactFeedbackGenerator(style: .rigid).impactOccurred()
+        let demo = ContentView.makeDemoImage()
+        let demoTint = ContentView.dominantColor(of: demo)
+        withAnimation(.spring(response: 0.5, dampingFraction: 0.8)) {
+            hero = demo
+            heroFile = ContentView.demoFilename
+            heroTint = demoTint
+            history.removeAll()
+            variations.removeAll()
+            savedFilenames.removeAll()
+            selectedVibes.removeAll()
+            prompt = ""
+            errorBanner = nil
         }
     }
 
@@ -885,6 +1012,89 @@ final class ImageService {
         microPixLyra: 0, microPixVega: 0, nanoPixLuna: 0, nanoRenSpica: 0,
         question: 0, summary: 0, upload: 0
     )
+}
+
+// MARK: - Fullscreen image viewer
+
+struct FullScreenImageView: View {
+    let image: UIImage
+    @Binding var isPresented: Bool
+
+    @State private var scale: CGFloat = 1.0
+    @State private var lastScale: CGFloat = 1.0
+    @State private var offset: CGSize = .zero
+    @State private var lastOffset: CGSize = .zero
+
+    var body: some View {
+        ZStack {
+            Color.black.ignoresSafeArea()
+            Image(uiImage: image)
+                .resizable()
+                .interpolation(.high)
+                .aspectRatio(contentMode: .fit)
+                .scaleEffect(scale)
+                .offset(offset)
+                .gesture(
+                    MagnificationGesture()
+                        .onChanged { value in
+                            scale = max(1.0, min(lastScale * value, 6.0))
+                        }
+                        .onEnded { _ in
+                            lastScale = scale
+                            if scale <= 1.01 {
+                                withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                                    scale = 1.0
+                                    offset = .zero
+                                    lastOffset = .zero
+                                }
+                                lastScale = 1.0
+                            }
+                        }
+                )
+                .simultaneousGesture(
+                    DragGesture()
+                        .onChanged { value in
+                            guard scale > 1.0 else { return }
+                            offset = CGSize(
+                                width: lastOffset.width + value.translation.width,
+                                height: lastOffset.height + value.translation.height
+                            )
+                        }
+                        .onEnded { _ in lastOffset = offset }
+                )
+                .onTapGesture(count: 2) {
+                    withAnimation(.spring(response: 0.35, dampingFraction: 0.8)) {
+                        if scale > 1.0 {
+                            scale = 1.0
+                            offset = .zero
+                        } else {
+                            scale = 2.5
+                        }
+                        lastScale = scale
+                        lastOffset = offset
+                    }
+                }
+            VStack {
+                HStack {
+                    Spacer()
+                    Button {
+                        isPresented = false
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .bold))
+                            .foregroundStyle(.white.opacity(0.75))
+                            .frame(width: 36, height: 36)
+                            .background(Circle().fill(.white.opacity(0.08)))
+                            .overlay(Circle().strokeBorder(.white.opacity(0.12), lineWidth: 0.5))
+                    }
+                }
+                .padding(.horizontal, 22)
+                .padding(.top, 12)
+                Spacer()
+            }
+        }
+        .preferredColorScheme(.dark)
+    }
 }
 
 #Preview {
