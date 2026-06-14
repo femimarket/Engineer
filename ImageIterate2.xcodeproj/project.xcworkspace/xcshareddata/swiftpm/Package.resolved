@@ -1,0 +1,15 @@
+{
+  "originHash" : "9bc9d57fbc53d159b2f6ed7fc0be6dc3e9f551fa0db071804ca7cea4d586c0ce",
+  "pins" : [
+    {
+      "identity" : "swiftapi",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/femimarket/swiftapi",
+      "state" : {
+        "revision" : "d4cff33aa11053fcfa2e0ea02ec14b9d1210ea5b",
+        "version" : "0.1.0"
+      }
+    }
+  ],
+  "version" : 3
+}

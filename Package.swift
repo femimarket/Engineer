@@ -17,13 +17,13 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(path: "Generated/Api"),
+        .package(url: "https://github.com/femimarket/swiftapi", branch: "main"),
     ],
     targets: [
         .target(
             name: "ImageIterate2",
             dependencies: [
-                .product(name: "Api", package: "Api"),
+                .product(name: "Api", package: "swiftapi"),
             ],
             path: "ImageIterate2",
             exclude: [

@@ -9,12 +9,12 @@
         "packageRef" : {
           "identity" : "api",
           "kind" : "fileSystem",
-          "location" : "/Users/u/swiftapps/ImageIterate2/Generated/Api",
+          "location" : "/Users/u/swiftapps/Api/Generated/Api",
           "name" : "Api"
         },
         "state" : {
           "name" : "fileSystem",
-          "path" : "/Users/u/swiftapps/ImageIterate2/Generated/Api"
+          "path" : "/Users/u/swiftapps/Api/Generated/Api"
         },
         "subpath" : "api"
       }

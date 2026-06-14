@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		14F0D4522FDD6DC100ABD6BB /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 14F0D4512FDD6DC100ABD6BB /* Api */; };
+		144C0BC22FDED26E0054A975 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 144C0BC12FDED26E0054A975 /* Api */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -27,7 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14F0D4522FDD6DC100ABD6BB /* Api in Frameworks */,
+				144C0BC22FDED26E0054A975 /* Api in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -70,7 +70,7 @@
 			);
 			name = ImageIterate2;
 			packageProductDependencies = (
-				14F0D4512FDD6DC100ABD6BB /* Api */,
+				144C0BC12FDED26E0054A975 /* Api */,
 			);
 			productName = ImageIterate2;
 			productReference = 14F0D4422FDD6B1400ABD6BB /* ImageIterate2.app */;
@@ -101,7 +101,7 @@
 			mainGroup = 14F0D4392FDD6B1400ABD6BB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				14F0D4502FDD6DC100ABD6BB /* XCLocalSwiftPackageReference "Generated/Api" */,
+				144C0BC02FDED26E0054A975 /* XCRemoteSwiftPackageReference "swiftapi" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 14F0D4432FDD6B1400ABD6BB /* Products */;
@@ -342,16 +342,21 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCLocalSwiftPackageReference section */
-		14F0D4502FDD6DC100ABD6BB /* XCLocalSwiftPackageReference "Generated/Api" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = Generated/Api;
+/* Begin XCRemoteSwiftPackageReference section */
+		144C0BC02FDED26E0054A975 /* XCRemoteSwiftPackageReference "swiftapi" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/femimarket/swiftapi";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.0;
+			};
 		};
-/* End XCLocalSwiftPackageReference section */
+/* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		14F0D4512FDD6DC100ABD6BB /* Api */ = {
+		144C0BC12FDED26E0054A975 /* Api */ = {
 			isa = XCSwiftPackageProductDependency;
+			package = 144C0BC02FDED26E0054A975 /* XCRemoteSwiftPackageReference "swiftapi" */;
 			productName = Api;
 		};
 /* End XCSwiftPackageProductDependency section */

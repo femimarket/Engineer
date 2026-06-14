@@ -37,239 +37,235 @@
       "inputs" : [
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIs.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIs.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Extensions.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Extensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Models.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Models.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Validation.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Validation.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/API.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/API.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAction.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAction.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAiModel.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAiModel.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatMessage.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatMessage.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatRole.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatRole.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiKey.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiKey.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPay.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPay.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPayProvider.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPayProvider.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPricing.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPricing.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiStatus.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiStatus.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePay.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePay.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePayStatus.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePayStatus.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/AudioLine.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/AudioLine.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/CharacterAlignment.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/CharacterAlignment.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Episode.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Episode.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Faq.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Faq.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/LyricSync.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/LyricSync.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Model.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Model.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Pay.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Pay.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayProvider.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayProvider.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayStatus.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayStatus.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Project.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Project.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Revolut.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Revolut.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Scene.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Scene.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Season.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Season.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Shot.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Shot.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Solana.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Solana.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Square.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Square.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Status.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Status.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Upload.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Upload.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/UploadModel.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Wise.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Wise.swift"
-        },
-        {
-          "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/WordAlignment.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/WordAlignment.swift"
         },
         {
           "kind" : "file",
@@ -340,7 +336,6 @@
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/Square.swift.o",
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/Status.swift.o",
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/Upload.swift.o",
-        "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/UploadModel.swift.o",
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/Wise.swift.o",
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/WordAlignment.swift.o"
       ],
@@ -621,10 +616,6 @@
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/UploadModel.swift.o"
-        },
-        {
-          "kind" : "file",
           "name" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/Wise.swift.o"
         },
         {
@@ -638,65 +629,64 @@
       ],
       "prepareForIndexing" : false,
       "sources" : [
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIs.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Extensions.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Models.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Validation.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/API.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAction.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAiModel.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatMessage.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatRole.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiKey.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPay.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPayProvider.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPricing.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiStatus.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePay.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePayStatus.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/AudioLine.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/CharacterAlignment.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Episode.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Faq.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/LyricSync.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Model.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Pay.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayProvider.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayStatus.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Project.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Revolut.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Scene.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Season.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Shot.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Solana.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Square.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Status.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Upload.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/UploadModel.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Wise.swift",
-        "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/WordAlignment.swift"
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIs.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Extensions.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Models.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Validation.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/API.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAction.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAiModel.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatMessage.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatRole.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiKey.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPay.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPayProvider.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPricing.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiStatus.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePay.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePayStatus.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/AudioLine.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/CharacterAlignment.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Episode.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Faq.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/LyricSync.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Model.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Pay.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayProvider.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayStatus.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Project.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Revolut.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Scene.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Season.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Shot.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Solana.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Square.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Status.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Upload.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Wise.swift",
+        "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/WordAlignment.swift"
       ],
       "tempsPath" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build",
       "wholeModuleOptimization" : false
@@ -709,6 +699,10 @@
         {
           "kind" : "file",
           "name" : "/Users/u/swiftapps/ImageIterate2/ImageIterate2/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/u/swiftapps/ImageIterate2/ImageIterate2/MediaApi.swift"
         },
         {
           "kind" : "file",
@@ -736,6 +730,7 @@
       "moduleOutputPath" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Modules/ImageIterate2.swiftmodule",
       "objects" : [
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/ContentView.swift.o",
+        "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/MediaApi.swift.o",
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/resource_bundle_accessor.swift.o"
       ],
       "otherArguments" : [
@@ -795,6 +790,10 @@
         },
         {
           "kind" : "file",
+          "name" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/MediaApi.swift.o"
+        },
+        {
+          "kind" : "file",
           "name" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/resource_bundle_accessor.swift.o"
         },
         {
@@ -805,6 +804,7 @@
       "prepareForIndexing" : false,
       "sources" : [
         "/Users/u/swiftapps/ImageIterate2/ImageIterate2/ContentView.swift",
+        "/Users/u/swiftapps/ImageIterate2/ImageIterate2/MediaApi.swift",
         "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/DerivedSources/resource_bundle_accessor.swift"
       ],
       "tempsPath" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build",
@@ -822,65 +822,64 @@
       "-package-name",
       "api",
       "-c",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIs.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Extensions.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Models.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Validation.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/API.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAction.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAiModel.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatMessage.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatRole.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiKey.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPay.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPayProvider.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPricing.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiStatus.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePay.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePayStatus.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/AudioLine.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/CharacterAlignment.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Episode.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Faq.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/LyricSync.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Model.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Pay.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayProvider.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayStatus.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Project.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Revolut.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Scene.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Season.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Shot.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Solana.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Square.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Status.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Upload.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/UploadModel.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Wise.swift",
-      "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/WordAlignment.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIs.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Extensions.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Models.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Validation.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/API.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAction.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAiModel.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatMessage.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatRole.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiKey.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPay.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPayProvider.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPricing.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiStatus.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePay.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePayStatus.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/AudioLine.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/CharacterAlignment.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Episode.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Faq.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/LyricSync.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Model.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Pay.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayProvider.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayStatus.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Project.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Revolut.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Scene.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Season.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Shot.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Solana.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Square.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Status.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Upload.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Wise.swift",
+      "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/WordAlignment.swift",
       "-I",
       "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Modules",
       "-target",
@@ -941,6 +940,7 @@
       "imageiterate2",
       "-c",
       "/Users/u/swiftapps/ImageIterate2/ImageIterate2/ContentView.swift",
+      "/Users/u/swiftapps/ImageIterate2/ImageIterate2/MediaApi.swift",
       "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/ImageIterate2.build/DerivedSources/resource_bundle_accessor.swift",
       "-I",
       "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Modules",
@@ -1024,239 +1024,235 @@
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApiKeyRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ApplePayRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/LyricSyncRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/PayRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/ProjectRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/RevolutRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SolanaRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/SquareRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/StripeRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/UploadRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/APIs/WiseRouteAPI.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIHelper.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/APIs.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/APIs.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/CodableHelper.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Extensions.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Extensions.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONDataEncoding.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONEncodingHelper.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/JSONValue.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Models.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Models.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenAPIMutex.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/OpenISO8601DateFormatter.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/SynchronizedDictionary.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/URLSessionImplementations.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Infrastructure/Validation.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Infrastructure/Validation.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/API.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/API.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAction.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAction.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiAiModel.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiAiModel.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatMessage.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatMessage.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiChatRole.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiChatRole.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiKey.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiKey.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPay.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPay.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPayProvider.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPayProvider.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiPricing.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiPricing.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApiStatus.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApiStatus.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePay.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePay.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/ApplePayStatus.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/ApplePayStatus.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/AudioLine.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/AudioLine.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/CharacterAlignment.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/CharacterAlignment.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Episode.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Episode.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Faq.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Faq.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/LyricSync.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/LyricSync.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Model.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Model.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Pay.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Pay.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayProvider.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayProvider.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/PayStatus.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/PayStatus.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Project.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Project.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Revolut.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Revolut.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Scene.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Scene.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Season.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Season.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Shot.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Shot.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Solana.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Solana.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Square.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Square.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Status.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Status.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Upload.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Upload.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/UploadModel.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/Wise.swift"
         },
         {
           "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/Wise.swift"
-        },
-        {
-          "kind" : "file",
-          "name" : "/Users/u/swiftapps/ImageIterate2/Generated/Api/Sources/Api/Models/WordAlignment.swift"
+          "name" : "/Users/u/swiftapps/Api/Generated/Api/Sources/Api/Models/WordAlignment.swift"
         }
       ],
       "outputFilePath" : "/Users/u/swiftapps/ImageIterate2/.build/arm64-apple-macosx/debug/Api.build/sources"
@@ -1271,6 +1267,10 @@
         {
           "kind" : "file",
           "name" : "/Users/u/swiftapps/ImageIterate2/ImageIterate2/ContentView.swift"
+        },
+        {
+          "kind" : "file",
+          "name" : "/Users/u/swiftapps/ImageIterate2/ImageIterate2/MediaApi.swift"
         },
         {
           "kind" : "file",

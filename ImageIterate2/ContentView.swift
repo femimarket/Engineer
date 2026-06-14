@@ -880,14 +880,26 @@ final class ImageService: @unchecked Sendable {
 
     /// `imageFilename` is the server-side filename of a previously-known image, or
     /// `""` to let the server use the default image.
+    ///
+    /// Flow:
+    /// 1. Send `prompt` to chat → server returns N distinct variations of the
+    ///    user's idea (creative entropy — each prompt is derived from the same
+    ///    seed idea but phrased differently).
+    /// 2. Run N parallel generations, one per chat-expanded prompt.
+    /// This is what makes the "1 image, many iterations" flow feel creative
+    /// rather than producing N near-identical images from the same prompt.
     func generate(prompt: String, imageFilename: String, count: Int) async throws -> [GenerationResult] {
-        log("STEP 1", "spawn \(count) parallel generations imageRef='\(imageFilename.isEmpty ? "<default>" : imageFilename)'")
+        log("STEP 0", "chat-expand 1 idea → \(count) distinct prompts")
+        let expandedPrompts = try await chatExpand(prompt: prompt, count: count)
+        log("STEP 0 OK", "received \(expandedPrompts.count) prompts")
+
+        log("STEP 1", "spawn \(expandedPrompts.count) parallel generations imageRef='\(imageFilename.isEmpty ? "<default>" : imageFilename)'")
         return try await withThrowingTaskGroup(of: Result<GenerationResult, Error>.self) { group in
-            for i in 0..<count {
+            for (i, expandedPrompt) in expandedPrompts.enumerated() {
                 group.addTask { [weak self] in
                     guard let self else { return .failure(ImageServiceError.requestFailed("service gone")) }
                     do {
-                        let r = try await self.singleGenerate(prompt: prompt, imageFilename: imageFilename, slot: i)
+                        let r = try await self.singleGenerate(prompt: expandedPrompt, imageFilename: imageFilename, slot: i)
                         log("STEP 1.\(i) OK", "image \(Int(r.image.size.width))x\(Int(r.image.size.height)) file='\(r.filename)'")
                         return .success(r)
                     } catch let e as ImageServiceError {
@@ -911,12 +923,58 @@ final class ImageService: @unchecked Sendable {
                 guard let e = firstError else { return "none" }
                 return (e as? ImageServiceError)?.errorDescription ?? (e as NSError).localizedDescription
             }()
-            log("STEP 1 DONE", "success=\(results.count)/\(count) firstError=\(errSummary)")
+            log("STEP 1 DONE", "success=\(results.count)/\(expandedPrompts.count) firstError=\(errSummary)")
             if results.isEmpty {
                 throw firstError ?? ImageServiceError.requestFailed("no images returned")
             }
             return results
         }
+    }
+
+    /// Sends the user's idea to chat and gets back `count` distinct generation
+    /// prompts derived from it — each one a different angle on the same seed
+    /// idea, for creative entropy.
+    private func chatExpand(prompt: String, count: Int) async throws -> [String] {
+        let systemInstruction = """
+            You are an image-generation prompt expander. Given the user's idea, \
+            return exactly \(count) distinct image generation prompts, each on \
+            its own line, no numbering or bullet points. Each prompt should be \
+            a different creative interpretation of the same seed idea — same \
+            essence, distinct angles, vibes, compositions. Keep each prompt \
+            under 30 words.
+            """
+        let userPrompt = prompt.isEmpty ? "Surprise me — generate something interesting." : prompt
+
+        let response = try await call(
+            action: .chat,
+            id: UUID(),
+            image: "",
+            prompt: userPrompt,
+            messages: [
+                ApiChatMessage(content: systemInstruction, role: .user),
+                ApiChatMessage(content: userPrompt, role: .user)
+            ],
+            slot: -1
+        )
+
+        // Expect: assistant messages (or a single newline-delimited assistant
+        // message) carrying the expanded prompts. Parse defensively — if the
+        // server returns fewer than `count`, pad by repeating the user's
+        // original prompt.
+        let assistantContents = response.messages
+            .filter { $0.role == .assistant }
+            .map(\.content)
+        let lines = assistantContents
+            .flatMap { $0.split(whereSeparator: \.isNewline) }
+            .map { String($0).trimmingCharacters(in: .whitespaces) }
+            .filter { !$0.isEmpty }
+
+        if lines.count >= count {
+            return Array(lines.prefix(count))
+        }
+        // Fallback: pad with the original to never block generation on a poor
+        // chat response.
+        return lines + Array(repeating: userPrompt, count: count - lines.count)
     }
 
     private func singleGenerate(prompt: String, imageFilename: String, slot: Int) async throws -> GenerationResult {
@@ -968,10 +1026,11 @@ final class ImageService: @unchecked Sendable {
         requestId: String = "",
         image: String,
         prompt: String,
+        messages: [ApiChatMessage] = [ApiChatMessage(content: "", role: .user)],
         slot: Int
     ) async throws -> API {
         let tag = "[slot \(slot)][\(action.rawValue)]"
-        log(tag, "→ POST \(ApiAPIConfiguration.shared.basePath)/api id=\(id) requestId='\(requestId)' image.len=\(image.count) prompt.len=\(prompt.count)")
+        log(tag, "→ POST \(ApiAPIConfiguration.shared.basePath)/api id=\(id) requestId='\(requestId)' image.len=\(image.count) prompt.len=\(prompt.count) messages=\(messages.count)")
         do {
             let result = try await ApiAPI.api(
                 action: action,
@@ -981,7 +1040,7 @@ final class ImageService: @unchecked Sendable {
                 file: "",
                 id: id,
                 image: image,
-                messages: [ApiChatMessage(content: "", role: .user)],
+                messages: messages,
                 model: .zimageturbo,
                 pay: Self.emptyPay,
                 pricing: Self.emptyPricing,
