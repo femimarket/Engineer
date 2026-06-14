@@ -27,6 +27,11 @@ struct ContentView: View {
     @State private var addingNew = false
     @State private var runs: [Run] = ContentView.makeSeedRuns()
     @State private var editorVisible = true
+    /// Captured for the undo toast: the row just removed and where it sat,
+    /// so we can re-insert at the original index. Cleared on the auto-timer
+    /// or when the user explicitly undoes.
+    @State private var pendingUndo: (run: Run, index: Int)?
+    @State private var undoDismissTask: Task<Void, Never>?
 
     @FocusState private var focusedField: Field?
     enum Field: Hashable {
@@ -76,7 +81,7 @@ struct ContentView: View {
                     ZStack(alignment: .top) {
                         ScrollView {
                             VStack(alignment: .leading, spacing: 20) {
-                                sectionLabel("PROMPT")
+                                promptHeader
                                     .id("editorTop")
                                 chipFlow
                                     .padding(.horizontal, 16)
@@ -111,6 +116,17 @@ struct ContentView: View {
                 generateButton
                     .padding(.horizontal, 22)
                     .padding(.bottom, 14)
+            }
+
+            if pendingUndo != nil {
+                VStack {
+                    Spacer()
+                    undoToast
+                        .padding(.horizontal, 22)
+                        .padding(.bottom, 88)
+                        .transition(.move(edge: .bottom).combined(with: .opacity))
+                }
+                .allowsHitTesting(true)
             }
         }
         .preferredColorScheme(.dark)
@@ -187,6 +203,69 @@ struct ContentView: View {
         .accessibilityLabel("Scroll back to editor. Current prompt: \(chips.map(\.text).joined(separator: ", "))")
     }
 
+    /// Transient toast for undoing the last row removal. Auto-dismisses
+    /// after 3 seconds — long enough to catch a mistake, short enough not
+    /// to clutter the screen.
+    private var undoToast: some View {
+        HStack(spacing: 12) {
+            Image(systemName: "trash")
+                .font(.system(size: 12, weight: .semibold))
+                .foregroundStyle(.white.opacity(0.7))
+            Text("Result removed")
+                .font(.system(size: 13, weight: .medium))
+                .foregroundStyle(.white)
+            Spacer()
+            Button {
+                undoRemove()
+            } label: {
+                Text("Undo")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color(red: 1.0, green: 0.30, blue: 0.65))
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Undo remove")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 10)
+        .background(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .fill(Color.black.opacity(0.7))
+        )
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .strokeBorder(.white.opacity(0.15), lineWidth: 0.5)
+        )
+        .shadow(color: .black.opacity(0.4), radius: 16, y: 6)
+    }
+
+    /// PROMPT section header with an inline CLEAR affordance on the right.
+    /// Lets the user wipe the chip set in one tap instead of x-ing 10 chips.
+    private var promptHeader: some View {
+        HStack(spacing: 0) {
+            sectionLabel("PROMPT")
+            Spacer()
+            if !chips.isEmpty {
+                Button {
+                    clearAll()
+                } label: {
+                    Text("CLEAR")
+                        .font(.system(size: 10, weight: .heavy))
+                        .tracking(1.5)
+                        .foregroundStyle(.white.opacity(0.5))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 4)
+                        .background(Capsule().fill(.white.opacity(0.05)))
+                        .overlay(Capsule().strokeBorder(.white.opacity(0.12), lineWidth: 0.5))
+                }
+                .buttonStyle(.plain)
+                .padding(.trailing, 22)
+                .accessibilityLabel("Clear all phrases")
+            }
+        }
+    }
+
     private func sectionLabel(_ text: String) -> some View {
         Text(text)
             .font(.system(size: 10, weight: .heavy))
@@ -234,9 +313,9 @@ struct ContentView: View {
                     remove(chip)
                 } label: {
                     Image(systemName: "xmark")
-                        .font(.system(size: 9, weight: .bold))
+                        .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(.white.opacity(0.6))
-                        .frame(width: 16, height: 16)
+                        .frame(width: 22, height: 22)
                         .background(Circle().fill(.white.opacity(0.10)))
                 }
                 .buttonStyle(.plain)
@@ -379,7 +458,11 @@ struct ContentView: View {
                         .foregroundStyle(.white.opacity(0.4))
                 }
                 VStack(spacing: 8) {
-                    heartButton(run)
+                    if run.state == .failed {
+                        retryButton(run)
+                    } else {
+                        heartButton(run)
+                    }
                     removeButton(run)
                 }
             }
@@ -421,6 +504,20 @@ struct ContentView: View {
         }
         .buttonStyle(.plain)
         .accessibilityLabel(run.liked ? "Unlike result" : "Like result")
+    }
+
+    private func retryButton(_ run: Run) -> some View {
+        Button {
+            retry(run)
+        } label: {
+            Image(systemName: "arrow.clockwise")
+                .font(.system(size: 11, weight: .bold))
+                .foregroundStyle(.white.opacity(0.8))
+                .frame(width: 28, height: 28)
+                .background(Circle().fill(.white.opacity(0.10)))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel("Retry generation")
     }
 
     private func removeButton(_ run: Run) -> some View {
@@ -682,20 +779,35 @@ struct ContentView: View {
             trimHistory()
         }
         for run in new {
-            Task { @MainActor in
-                try? await Task.sleep(for: .seconds(Double.random(in: 0.7...1.9)))
-                guard let idx = runs.firstIndex(where: { $0.id == run.id }) else { return }
-                let failed = Int.random(in: 0..<100) < 12
-                withAnimation(.easeOut(duration: 0.25)) {
-                    runs[idx].state = failed ? .failed : .loaded
-                }
-                if failed {
-                    UINotificationFeedbackGenerator().notificationOccurred(.error)
-                } else {
-                    UIImpactFeedbackGenerator(style: .soft).impactOccurred()
-                }
+            resolveMock(run.id)
+        }
+    }
+
+    /// Mock resolution of a single run on a jittered timer with a small
+    /// failure probability. Used by both initial generation and retry.
+    private func resolveMock(_ runId: Run.ID) {
+        Task { @MainActor in
+            try? await Task.sleep(for: .seconds(Double.random(in: 0.7...1.9)))
+            guard let idx = runs.firstIndex(where: { $0.id == runId }) else { return }
+            let failed = Int.random(in: 0..<100) < 12
+            withAnimation(.easeOut(duration: 0.25)) {
+                runs[idx].state = failed ? .failed : .loaded
+            }
+            if failed {
+                UINotificationFeedbackGenerator().notificationOccurred(.error)
+            } else {
+                UIImpactFeedbackGenerator(style: .soft).impactOccurred()
             }
         }
+    }
+
+    private func retry(_ run: Run) {
+        guard let idx = runs.firstIndex(where: { $0.id == run.id }) else { return }
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        withAnimation(.easeOut(duration: 0.2)) {
+            runs[idx].state = .loading
+        }
+        resolveMock(run.id)
     }
 
     /// Tap a past run to replace the editor with its prompt. Fresh chip IDs
@@ -709,9 +821,39 @@ struct ContentView: View {
     }
 
     private func removeRun(_ run: Run) {
+        guard let idx = runs.firstIndex(where: { $0.id == run.id }) else { return }
         UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        let removed = runs[idx]
         withAnimation(.spring(response: 0.3, dampingFraction: 0.8)) {
-            runs.removeAll { $0.id == run.id }
+            runs.remove(at: idx)
+            pendingUndo = (removed, idx)
+        }
+        undoDismissTask?.cancel()
+        undoDismissTask = Task { @MainActor in
+            try? await Task.sleep(for: .seconds(3))
+            guard !Task.isCancelled else { return }
+            withAnimation(.easeOut(duration: 0.2)) {
+                pendingUndo = nil
+            }
+        }
+    }
+
+    private func undoRemove() {
+        guard let undo = pendingUndo else { return }
+        undoDismissTask?.cancel()
+        UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+        let insertAt = min(undo.index, runs.count)
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+            runs.insert(undo.run, at: insertAt)
+            pendingUndo = nil
+        }
+    }
+
+    private func clearAll() {
+        dismissAll()
+        UIImpactFeedbackGenerator(style: .light).impactOccurred()
+        withAnimation(.spring(response: 0.3, dampingFraction: 0.85)) {
+            chips.removeAll()
         }
     }
 
@@ -723,7 +865,20 @@ struct ContentView: View {
         }
     }
 
+    /// Trims to `maxRuns`, evicting unliked rows from the tail first so the
+    /// user's keepers survive past the cap. Liked rows only get evicted as
+    /// a last resort (when every remaining row is liked).
     private func trimHistory() {
+        var overflow = runs.count - maxRuns
+        guard overflow > 0 else { return }
+        var i = runs.count - 1
+        while overflow > 0 && i >= 0 {
+            if !runs[i].liked {
+                runs.remove(at: i)
+                overflow -= 1
+            }
+            i -= 1
+        }
         if runs.count > maxRuns {
             runs.removeLast(runs.count - maxRuns)
         }
