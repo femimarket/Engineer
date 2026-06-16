@@ -42,6 +42,10 @@ struct Run: Identifiable {
     /// Index into `gradientPalettes` — used as the shimmer/failure backdrop
     /// and the fallback if decoding fails.
     let paletteIndex: Int
+    /// Shared across the rows from one Generate tap so the UI can group them
+    /// under one batch header.
+    let batchId: UUID
+    let createdAt: Date
 
     init(
         id: UUID = UUID(),
@@ -50,7 +54,9 @@ struct Run: Identifiable {
         imageFilename: String = "",
         image: UIImage? = nil,
         liked: Bool = false,
-        paletteIndex: Int
+        paletteIndex: Int,
+        batchId: UUID,
+        createdAt: Date = Date()
     ) {
         self.id = id
         self.chips = chips
@@ -59,7 +65,17 @@ struct Run: Identifiable {
         self.image = image
         self.liked = liked
         self.paletteIndex = paletteIndex
+        self.batchId = batchId
+        self.createdAt = createdAt
     }
+}
+
+/// One batch as rendered in the RESULTS section. Grouping is derived from
+/// `Run.batchId`; this struct only exists to give ForEach a stable identity.
+struct RunBatch: Identifiable {
+    let id: UUID
+    let createdAt: Date
+    let runs: [Run]
 }
 
 struct PendingUndo: Identifiable {
@@ -69,13 +85,42 @@ struct PendingUndo: Identifiable {
 }
 
 /// On-disk record of one row. Only `.loaded` runs persist — anything mid-flight
-/// when the app dies is dropped.
+/// when the app dies is dropped. `batchId` and `createdAt` decode-if-present so
+/// runs written by earlier builds still load (they each become their own batch
+/// with timestamp = now).
 private struct PersistedRun: Codable {
     let id: UUID
     let chips: [Chip]
     let imageFilename: String
     let liked: Bool
     let paletteIndex: Int
+    let batchId: UUID
+    let createdAt: Date
+
+    enum CodingKeys: String, CodingKey {
+        case id, chips, imageFilename, liked, paletteIndex, batchId, createdAt
+    }
+
+    init(id: UUID, chips: [Chip], imageFilename: String, liked: Bool, paletteIndex: Int, batchId: UUID, createdAt: Date) {
+        self.id = id
+        self.chips = chips
+        self.imageFilename = imageFilename
+        self.liked = liked
+        self.paletteIndex = paletteIndex
+        self.batchId = batchId
+        self.createdAt = createdAt
+    }
+
+    init(from decoder: Decoder) throws {
+        let c = try decoder.container(keyedBy: CodingKeys.self)
+        id = try c.decode(UUID.self, forKey: .id)
+        chips = try c.decode([Chip].self, forKey: .chips)
+        imageFilename = try c.decode(String.self, forKey: .imageFilename)
+        liked = try c.decode(Bool.self, forKey: .liked)
+        paletteIndex = try c.decode(Int.self, forKey: .paletteIndex)
+        batchId = try c.decodeIfPresent(UUID.self, forKey: .batchId) ?? UUID()
+        createdAt = try c.decodeIfPresent(Date.self, forKey: .createdAt) ?? Date()
+    }
 }
 
 // MARK: - Persistence
@@ -126,7 +171,9 @@ private enum Store {
                 imageFilename: p.imageFilename,
                 image: img,
                 liked: p.liked,
-                paletteIndex: p.paletteIndex
+                paletteIndex: p.paletteIndex,
+                batchId: p.batchId,
+                createdAt: p.createdAt
             )
         }
     }
@@ -139,7 +186,9 @@ private enum Store {
                 chips: $0.chips,
                 imageFilename: $0.imageFilename,
                 liked: $0.liked,
-                paletteIndex: $0.paletteIndex
+                paletteIndex: $0.paletteIndex,
+                batchId: $0.batchId,
+                createdAt: $0.createdAt
             )}
         guard let data = try? JSONEncoder().encode(persisted) else { return }
         UserDefaults.standard.set(data, forKey: runsKey)
@@ -339,6 +388,7 @@ struct ContentView: View {
     /// In-flight generation tasks, keyed by run id. Cancelled when the row
     /// is removed so we don't burn API calls on results no one will see.
     @State private var inflight: [Run.ID: Task<Void, Never>] = [:]
+    @State private var showLikedOnly = false
 
     @FocusState private var focusedField: Field?
     enum Field: Hashable {
@@ -356,6 +406,10 @@ struct ContentView: View {
     private let maxChips = 20
     private let maxRuns = 30
     private let parallelRuns = 3
+    /// Credits charged per row generated (1 chat + 1 image generation). One
+    /// Generate tap fans out to `parallelRuns × creditPerRun` credits total.
+    private let creditPerRun = 1
+    private var costPerGenerate: Int { creditPerRun * parallelRuns }
     private var atCap: Bool { chips.count >= maxChips }
 
     private static let lightHaptic = UIImpactFeedbackGenerator(style: .soft)
@@ -398,7 +452,7 @@ struct ContentView: View {
                                 presetRail
 
                                 if !runs.isEmpty {
-                                    sectionLabel("RESULTS")
+                                    resultsHeader
                                     resultsSection
                                 }
                             }
@@ -730,12 +784,111 @@ struct ContentView: View {
 
     // MARK: Results
 
-    private var resultsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            ForEach(runs) { run in
-                resultRow(run)
+    /// RESULTS row with the LIKED filter chip on the right. Filter is hidden
+    /// when no liked rows exist (nothing to surface, no point in the affordance).
+    private var resultsHeader: some View {
+        HStack(spacing: 0) {
+            sectionLabel("RESULTS")
+            Spacer()
+            if runs.contains(where: { $0.liked }) {
+                likedFilterChip
+                    .padding(.trailing, 22)
             }
         }
+    }
+
+    private var likedFilterChip: some View {
+        Button {
+            UIImpactFeedbackGenerator(style: .soft).impactOccurred()
+            withAnimation(.easeInOut(duration: 0.2)) {
+                showLikedOnly.toggle()
+            }
+        } label: {
+            HStack(spacing: 4) {
+                Image(systemName: showLikedOnly ? "heart.fill" : "heart")
+                    .font(.system(size: 9, weight: .heavy))
+                Text("LIKED")
+                    .font(.system(size: 10, weight: .heavy))
+                    .tracking(1.5)
+            }
+            .foregroundStyle(showLikedOnly
+                ? Color(red: 1.0, green: 0.30, blue: 0.65)
+                : .white.opacity(0.5))
+            .padding(.horizontal, 10)
+            .padding(.vertical, 4)
+            .background(Capsule().fill(showLikedOnly
+                ? Color(red: 1.0, green: 0.30, blue: 0.65).opacity(0.15)
+                : .white.opacity(0.05)))
+            .overlay(Capsule().strokeBorder(showLikedOnly
+                ? Color(red: 1.0, green: 0.30, blue: 0.65).opacity(0.5)
+                : .white.opacity(0.12), lineWidth: 0.5))
+        }
+        .buttonStyle(.plain)
+        .accessibilityLabel(showLikedOnly ? "Show all results" : "Show only liked results")
+    }
+
+    private var resultsSection: some View {
+        let filtered = showLikedOnly ? runs.filter(\.liked) : runs
+        let batches = batched(filtered)
+        return VStack(alignment: .leading, spacing: 16) {
+            ForEach(batches) { batch in
+                VStack(alignment: .leading, spacing: 10) {
+                    batchHeader(batch.createdAt)
+                    ForEach(batch.runs) { run in
+                        resultRow(run)
+                    }
+                }
+            }
+        }
+    }
+
+    /// "GENERATED · 2m ago" caption above each batch of rows. Snapshot at
+    /// render time — relative string ages with each scroll re-render, which
+    /// is good enough for human time perception without a 1s timer.
+    private func batchHeader(_ date: Date) -> some View {
+        HStack(spacing: 6) {
+            Text("GENERATED")
+                .font(.system(size: 9, weight: .heavy))
+                .tracking(1.2)
+            Text("·")
+                .font(.system(size: 9, weight: .heavy))
+            Text(Self.relativeString(date))
+                .font(.system(size: 9, weight: .heavy))
+                .tracking(0.8)
+        }
+        .foregroundStyle(.white.opacity(0.4))
+        .padding(.horizontal, 22)
+    }
+
+    /// Groups consecutive runs with the same `batchId` into one render unit.
+    /// Order is preserved — a run can't migrate batches, so we walk linearly.
+    private func batched(_ runs: [Run]) -> [RunBatch] {
+        var result: [RunBatch] = []
+        var current: [Run] = []
+        for run in runs {
+            if let first = current.first, first.batchId == run.batchId {
+                current.append(run)
+            } else {
+                if let first = current.first {
+                    result.append(RunBatch(id: first.batchId, createdAt: first.createdAt, runs: current))
+                }
+                current = [run]
+            }
+        }
+        if let first = current.first {
+            result.append(RunBatch(id: first.batchId, createdAt: first.createdAt, runs: current))
+        }
+        return result
+    }
+
+    private static let relativeFormatter: RelativeDateTimeFormatter = {
+        let f = RelativeDateTimeFormatter()
+        f.unitsStyle = .abbreviated
+        return f
+    }()
+
+    private static func relativeString(_ date: Date) -> String {
+        relativeFormatter.localizedString(for: date, relativeTo: Date())
     }
 
     private func resultRow(_ run: Run) -> some View {
@@ -887,9 +1040,15 @@ struct ContentView: View {
             HStack(spacing: 10) {
                 Image(systemName: "sparkles")
                     .font(.system(size: 17, weight: .bold))
-                Text("Generate")
-                    .font(.system(size: 17, weight: .bold))
-                    .tracking(0.5)
+                VStack(spacing: 1) {
+                    Text("Generate")
+                        .font(.system(size: 17, weight: .bold))
+                        .tracking(0.5)
+                    Text("\(costPerGenerate) credits")
+                        .font(.system(size: 9, weight: .semibold))
+                        .tracking(0.4)
+                        .opacity(0.7)
+                }
             }
             .foregroundStyle(.white)
             .frame(maxWidth: .infinity)
@@ -1034,11 +1193,15 @@ struct ContentView: View {
         tap()
         let snapshot = chips.map { Chip(text: $0.text) }
         let idea = snapshot.map(\.text).joined(separator: ", ")
+        let batchId = UUID()
+        let createdAt = Date()
         let new = (0..<parallelRuns).map { _ in
             Run(
                 chips: snapshot.map { Chip(text: $0.text) },
                 state: .loading,
-                paletteIndex: Int.random(in: 0..<Self.gradientPalettes.count)
+                paletteIndex: Int.random(in: 0..<Self.gradientPalettes.count),
+                batchId: batchId,
+                createdAt: createdAt
             )
         }
         withAnimation(.spring(response: 0.35, dampingFraction: 0.85)) {
