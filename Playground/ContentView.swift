@@ -1015,7 +1015,7 @@ private struct AutoChipField: View {
 }
 
 private struct ChipWidthKey: PreferenceKey {
-    static var defaultValue: CGFloat = 70
+    static let defaultValue: CGFloat = 70
     static func reduce(value: inout CGFloat, nextValue: () -> CGFloat) {
         value = nextValue()
     }
