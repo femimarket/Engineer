@@ -18,19 +18,21 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/femimarket/swiftapi", branch: "main"),
-        .package(url: "https://github.com/femimarket/swift-project-service", branch: "main"),
     ],
     targets: [
         .target(
             name: "ImageIterate2",
             dependencies: [
                 .product(name: "Api", package: "swiftapi"),
-                .product(name: "ProjectService", package: "swift-project-service"),
             ],
-            path: "Prod",
+            path: "ImageIterate2",
             exclude: [
-                "ProdApp.swift",
+                "ImageIterate2App.swift",
+                "doc.md",
                 "Assets.xcassets",
+            ],
+            resources: [
+                .process("demoUploadSong_019e7f3d-aa21-7173-86ae-fbe8d61d0a84.png"),
             ]
         ),
     ],
