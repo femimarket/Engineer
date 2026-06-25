@@ -7,7 +7,7 @@
       "location" : "https://github.com/femimarket/swift-project-service",
       "state" : {
         "branch" : "main",
-        "revision" : "1bb2aac9c44dea059847cfbf48eca31b917c2c36"
+        "revision" : "4be286ba6da864c7c7ee8f73560762ddd03886c0"
       }
     },
     {
@@ -16,7 +16,7 @@
       "location" : "https://github.com/femimarket/swiftapi",
       "state" : {
         "branch" : "main",
-        "revision" : "db400f35b0a25d52fbbe60e96f49b687c21cb6e8"
+        "revision" : "92eaa4a385edb1de46e4d163ff2745332106f326"
       }
     }
   ],
