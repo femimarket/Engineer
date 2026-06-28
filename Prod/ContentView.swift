@@ -169,17 +169,23 @@ private enum Store {
 }
 
 // MARK: - Image service (real backend)
+//
+// New Api shape: direct static functions on `Api`, Rust FFI under the hood.
+// No URLSession, no OpenAPI client, no base64 manipulation in client code.
+// Each function returns `Data` directly — on lib-level failure the bytes will
+// be the sentinel fallback/topup PNG. Surfacing that to a `.failed` row would
+// require those sentinels to be public on `Api` (currently internal); for now
+// fallback bytes render as a regular result. Failure path still triggers if
+// `UIImage(data:)` can't decode the result downstream.
 
 enum ImageServiceError: LocalizedError {
-    case requestFailed(String)
+    case localReadFailed(String)
     case decodingFailed
-    case taskFailed
 
     var errorDescription: String? {
         switch self {
-        case .requestFailed(let s): return s
-        case .decodingFailed: return "couldn't read result"
-        case .taskFailed: return "generation failed"
+        case .localReadFailed(let s): return s
+        case .decodingFailed:         return "couldn't read result"
         }
     }
 }
@@ -187,18 +193,18 @@ enum ImageServiceError: LocalizedError {
 final class ImageService: @unchecked Sendable {
     static let shared = ImageService()
 
-    private var bearer: String = ""
+    private var user: String = ""
+    private var password: String = ""
 
     private init() {}
 
-    static func configure(bearer: String) {
-        shared.bearer = bearer
-        ApiAPIConfiguration.shared.customHeaders["Authorization"] = "Bearer \(bearer)"
+    static func configure(user: String, password: String) {
+        shared.user = user
+        shared.password = password
     }
 
-    /// Cast mode: load both reference files from disk, base64-encode raw
-    /// (iOS path per schema), and call Klein once. Caller is responsible for
-    /// pre-synthesizing the prompt — every text path runs through synth.
+    /// Cast mode: pass both reference files as raw `Data` and let the Rust
+    /// FFI handle base64. Caller pre-synthesizes the prompt.
     func castGenerate(
         prompt: String,
         characterFilename: String,
@@ -208,98 +214,48 @@ final class ImageService: @unchecked Sendable {
         let targetURL = ProjectService.getUrl(for: targetFilename)
         guard let characterData = try? Data(contentsOf: characterURL),
               let targetData = try? Data(contentsOf: targetURL) else {
-            throw ImageServiceError.requestFailed("couldn't read cast reference bytes")
+            throw ImageServiceError.localReadFailed("couldn't read cast reference bytes")
         }
-        let id = UUID()
-        let result = try await call(.typeFlux2KleinI2I(Flux2KleinI2I(
-            comfyRequestId: "",
-            file: "",
-            image: characterData.base64EncodedString(),
-            image2: targetData.base64EncodedString(),
-            prompt: prompt,
-            type: .flux2KleinI2I
-        )), id: id)
-        guard result.status == .completed else { throw ImageServiceError.taskFailed }
-        guard case .typeFlux2KleinI2I(let k) = result.action else {
-            throw ImageServiceError.decodingFailed
-        }
-        let data = try Self.decodeBase64(k.file)
-        return (data, "\(id.uuidString).png")
+        let result = await Api.flux2KleinI2I(
+            user: user,
+            password: password,
+            image: characterData,
+            image2: targetData,
+            prompt: prompt
+        )
+        return (result, "\(UUID().uuidString).png")
     }
 
-    /// Sends the user's idea to chat and returns one synthesized image prompt.
-    /// Per-slot natural variation comes from the LLM's own temperature when N
-    /// of these run in parallel against the same input. Runs on every Generate
-    /// regardless of mode — Engineer treats chat synthesis as universal.
+    /// Chat synthesis via Qwen. Runs on every Generate regardless of mode —
+    /// Engineer treats synthesis as universal. Returns the last assistant
+    /// message; falls back to the original idea if the model returned nothing.
     func chatSynthesize(idea: String) async throws -> String {
         let userIdea = idea.isEmpty ? "Surprise me — generate something interesting." : idea
         let synthesizerRequest = """
             Make image prompt frame for Flux2. Reply with only the prompt, nothing else.
             Idea: \(userIdea)
             """
-        let chatAction: ApiAction = .typeClaudeSonnet46(ClaudeSonnet46(
-            messages: [ApiChatMessage(content: synthesizerRequest, role: .user)],
-            type: .claudesonnet46
-        ))
-        let response = try await call(chatAction, id: UUID())
-        if case .typeClaudeSonnet46(let chat) = response.action,
-           let last = chat.messages.last(where: { $0.role == .assistant })?.content,
+        let messages = await Api.qwen3_6_35b_a3b(
+            user: user,
+            password: password,
+            messages: [(role: "user", content: synthesizerRequest)]
+        )
+        if let last = messages.last(where: { $0.role == "assistant" })?.content,
            !last.isEmpty {
             return last
         }
         return userIdea
     }
 
-    /// Single call → base64-decode. The result `file` is image bytes encoded
-    /// inline as base64 (optionally with a `data:image/...;base64,` prefix),
-    /// so the request returns the finished image in one round-trip. Caller
-    /// supplies a pre-synthesized prompt.
+    /// Default text-to-image via Flux2Pro. Caller supplies a pre-synthesized
+    /// prompt.
     func generate(prompt: String) async throws -> (Data, String) {
-        let id = UUID()
-        let result = try await call(.typeFlux2Pro(Flux2Pro(
-            falRequestId: "", file: "", prompt: prompt, type: .flux2Pro
-        )), id: id)
-        guard result.status == .completed else { throw ImageServiceError.taskFailed }
-        guard case .typeFlux2Pro(let fp) = result.action else {
-            throw ImageServiceError.decodingFailed
-        }
-        let data = try Self.decodeBase64(fp.file)
-        return (data, "\(id.uuidString).png")
-    }
-
-    private func call(_ action: ApiAction, id: UUID) async throws -> API {
-        let req = API(
-            action: action,
-            credit: 0,
-            id: id,
-            status: .pending,
-            userId: ""
+        let result = await Api.flux2Pro(
+            user: user,
+            password: password,
+            prompt: prompt
         )
-        do {
-            return try await ApiHandlerAPI.apiHandler(API: req)
-        } catch let ErrorResponse.error(status, data, _, underlying) {
-            let body = data.flatMap { String(data: $0, encoding: .utf8) } ?? ""
-            let ns = underlying as NSError
-            let msg = status > 0
-                ? "HTTP \(status) — \(body.prefix(120))"
-                : "\(ns.domain) \(ns.code): \(ns.localizedDescription)"
-            throw ImageServiceError.requestFailed(msg)
-        }
-    }
-
-    /// Decodes the `file` field returned by the model (base64, optionally
-    /// prefixed with a `data:image/...;base64,` URI scheme) into raw bytes.
-    private static func decodeBase64(_ encoded: String) throws -> Data {
-        let stripped: String
-        if let comma = encoded.firstIndex(of: ",") {
-            stripped = String(encoded[encoded.index(after: comma)...])
-        } else {
-            stripped = encoded
-        }
-        guard let data = Data(base64Encoded: stripped, options: [.ignoreUnknownCharacters]) else {
-            throw ImageServiceError.decodingFailed
-        }
-        return data
+        return (result, "\(UUID().uuidString).png")
     }
 }
 
@@ -325,8 +281,8 @@ public struct ContentView: View {
         case add
     }
 
-    public init(bearer: String) {
-        ImageService.configure(bearer: bearer)
+    public init(user: String, password: String) {
+        ImageService.configure(user: user, password: password)
         _chips = State(initialValue: Store.loadChips())
         _runs = State(initialValue: Store.loadRuns())
     }
@@ -1437,5 +1393,5 @@ private struct ShimmerOverlay: View {
 }
 
 #Preview {
-    ContentView(bearer: "019ec07a-c943-7275-b758-2315b8c9fa6f")
+    ContentView(user: "019ec07a-c943-7275-b758-2315b8c9fa6f", password: "")
 }

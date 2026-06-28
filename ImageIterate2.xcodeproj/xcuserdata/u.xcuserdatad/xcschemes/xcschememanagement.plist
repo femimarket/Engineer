@@ -12,17 +12,22 @@
 		<key>Playground.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<key>Prod.xcscheme_^#shared#^_</key>
 		<dict>
 			<key>orderHint</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 	</dict>
 	<key>SuppressBuildableAutocreation</key>
 	<dict>
 		<key>14F0D4412FDD6B1400ABD6BB</key>
+		<dict>
+			<key>primary</key>
+			<true/>
+		</dict>
+		<key>14F0D61B2FDF5711005DEEA5</key>
 		<dict>
 			<key>primary</key>
 			<true/>
