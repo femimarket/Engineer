@@ -238,9 +238,9 @@ final class ImageService: @unchecked Sendable {
         let messages = await Api.qwen3_6_35b_a3b(
             user: user,
             password: password,
-            messages: [(role: "user", content: synthesizerRequest)]
+            messages: [(role: .user, content: synthesizerRequest)]
         )
-        if let last = messages.last(where: { $0.role == "assistant" })?.content,
+        if let last = messages.last(where: { $0.role == .assistant })?.content,
            !last.isEmpty {
             return last
         }
