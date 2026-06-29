@@ -53,6 +53,14 @@ let package = Package(
                 "Assets.xcassets",
             ]
         ),
+        .testTarget(
+            name: "ProdTests",
+            dependencies: [
+                "Prod",
+                .product(name: "Api", package: "swiftapi"),
+            ],
+            path: "Tests/ProdTests"
+        ),
     ],
     swiftLanguageModes: [.v6]
 )
