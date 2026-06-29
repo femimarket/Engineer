@@ -1,106 +1,65 @@
-# Engineer
+# Prod
 
-A SwiftUI-based prompt builder and image generation client. It allows users to compose image prompts using modular "chips," synthesizes them via an LLM, and generates images using a Rust-backed FFI API. Results are persisted locally with metadata embedded directly into the image files.
+## Overview
+Prod is a SwiftUI-based prompt engineering and image generation client. It provides a chip-based interface for composing image prompts, integrates with a Rust-backed FFI API for text-to-image and image-to-image synthesis, and maintains a persistent, disk-backed history of generations with embedded metadata. The app is designed for rapid iteration, parallel generation, and tactile feedback, with a dark-themed UI optimized for mobile and desktop touch/mouse interaction.
 
-## Features
+## Architecture & Key Files
+- `Prod/ProdApp.swift` — Application entry point. Parses launch arguments for API authentication and instantiates the root view.
+- `Prod/ContentView.swift` — Core application logic. Contains all domain models (`Chip`, `Run`, `RunBatch`, `PendingUndo`), the `Store` persistence layer, `ImageService` for backend communication, and the complete SwiftUI view hierarchy including custom layout and input components.
+- External Modules:
+  - `Api` — Rust FFI bindings exposing synchronous/async functions for `qwen3_6_35b_a3b` (chat synthesis), `flux2Pro` (text-to-image), and `flux2KleinI2I` (image-to-image/cast mode).
+  - `ProjectService` — File I/O and IPTC/XMP metadata extraction/insertion. Handles disk storage under `Documents/` and provides URL resolution for generated assets.
 
-- **Chip-Based Prompting**: Build prompts by adding, editing, and removing text chips.
-- **LLM Synthesis**: Automatically refines raw ideas into optimized image prompts using Qwen.
-- **Image Generation**: Generates images via Flux2Pro (text-to-image) or Flux2KleinI2I (image-to-image/cast mode).
-- **Persistent History**: All generated images and prompts are saved to disk. Metadata (chips, likes, model info) is embedded as IPTC/XMP tags within the PNG files.
-- **Smart Batching**: Results are grouped into batches based on generation time.
-- **Undo & Favorites**: Remove results with a 3-second undo window; mark favorites to protect them from history trimming.
-
-## Architecture
-
-The application follows a clean separation between UI, business logic, and persistence:
-
-1.  **UI (`ContentView.swift`)**: Handles the chip editor, preset rail, and results list. It manages state for in-flight generation tasks and local undo buffers.
-2.  **Persistence (`Store` in `ContentView.swift`)**:
-    *   **Chips**: Saved to `UserDefaults`.
-    *   **Runs/Images**: Saved to the app's `Documents` directory. Each run is a single PNG file.
-    *   **Metadata**: Instead of a separate database, metadata is embedded in the PNGs using `ProjectService`.
-        *   **Chips**: Stored as IPTC Subject keywords.
-        *   **Prompt**: Stored as IPTC Caption/Abstract.
-        *   **Model**: Stored as TIFF Software tag.
-        *   **Like Status**: Stored as IPTC StarRating.
-3.  **Backend (`ImageService` in `ContentView.swift`)**:
-    *   Wraps static functions from the `Api` module (Rust FFI).
-    *   Handles the flow: `chatSynthesize` → `generate` (or `castGenerate`).
-    *   Returns raw `Data` which is then saved to disk.
-
-## Key Files
-
-*   `ContentView.swift`: The main application entry point for the UI. Contains all models (`Chip`, `Run`, `RunBatch`), the `Store` persistence logic, `ImageService` backend wrapper, and the `ContentView` view struct.
-*   `ProdApp.swift`: The `@main` app struct. Handles command-line argument parsing for credentials.
-
-## Installation & Setup
-
-### Prerequisites
-*   Xcode 15+
-*   iOS 17+ (due to SwiftUI features used)
-
-### Configuration
-The app requires authentication credentials to communicate with the backend API. These are passed via command-line arguments at launch.
-
-1.  Open the project in Xcode.
-2.  Go to **Product > Scheme > Edit Scheme...**
-3.  Select **Run** from the left sidebar, then navigate to the **Arguments** tab.
-4.  Under **Arguments Passed On Launch**, add the following:
-    *   `-u` followed by your API username.
-    *   `-p` followed by your API password.
-    
-    *Example:*
-    ```
-    -u
-    your-username-here
-    -p
-    your-password-here
-    ```
-
-**Note**: If these arguments are missing, the app will crash on launch with a `preconditionFailure` to prevent silent authentication errors.
+## Setup & Running
+1. Open the project in Xcode.
+2. Configure launch credentials in the Xcode scheme:
+   - `Product > Scheme > Edit Scheme... > Run > Arguments > Arguments Passed On Launch`
+   - Add: `-u <user>` `-p <password>`
+   - Missing credentials trigger a `preconditionFailure` on launch to prevent silent 401s downstream.
+3. Build and run. The app requires a SwiftUI-compatible deployment target (iOS/macOS).
 
 ## Usage
+### Prompt Building
+- Tap the `+` button to add phrase chips. Max 20 chips allowed.
+- Tap any chip to enter inline edit mode. Submit to save or leave empty to delete.
+- Use the horizontal preset rail (`Cinematic`, `Neon`, `Moody`, `Pastel`, `Film`, `Surreal`, `Vintage`, `Dreamy`) for quick inserts.
+- Tap `CLEAR` to reset the prompt builder.
 
-### Building a Prompt
-1.  Tap the **+ add** button to start a new chip.
-2.  Type your idea (e.g., "cyberpunk city") and press **Next** or **Done**.
-3.  Tap existing chips to edit them or the **×** button to remove them.
-4.  Use the **PRESETS** rail to quickly insert common style modifiers (e.g., "Cinematic", "Neon").
+### Generation
+- Tap `Generate` to fan out `parallelRuns` (3) concurrent requests.
+- Each run executes a two-step pipeline:
+  1. `chatSynthesize`: Sends the joined prompt to Qwen3 for refinement. Falls back to the original idea if the model returns empty.
+  2. `generate` or `castGenerate`: Routes to `Flux2Pro` (default) or `Flux2KleinI2I` (if character/target references are configured via `ProjectService.getCharacterCast()`).
+- The UI displays `costPerGenerate` credits (1 credit × 3 parallel runs = 3 credits per tap).
 
-### Generating Images
-1.  Ensure you have at least one chip.
-2.  Tap the **Generate** button at the bottom.
-3.  The app will fan out `parallelRuns` (default 3) generation tasks.
-4.  New rows appear with a shimmer effect while loading.
-5.  Once complete, the image thumbnail appears.
+### History & Results
+- Generated images appear in a scrollable list, grouped into 2-second batches based on `createdAt`.
+- Tap a result row to restore its prompt into the editor.
+- Use the heart icon to like/unlike. Liked rows are preserved during history trimming.
+- Use the trash icon to remove a row. A 3-second undo toast appears; tap `Undo` to restore it.
 
-### Managing Results
-*   **Restore**: Tap any result row to load its prompt back into the editor.
-*   **Like**: Tap the heart icon to favorite a result. Liked results are protected from automatic history trimming.
-*   **Retry**: Tap the retry icon on a failed or existing result to regenerate it.
-*   **Remove**: Tap the **×** icon on a result row. A toast notification appears with an **Undo** button for 3 seconds. If not undone, the image file is deleted from disk.
-*   **Filter**: Tap the **LIKED** chip in the Results header to toggle between showing all results or only favorites.
+## Persistence & Metadata
+Disk is the single source of truth. No separate database or JSON index is used.
+- Each run is stored as a PNG in `Documents/<runId>.png`.
+- Metadata is embedded directly into the PNG using IPTC/XMP fields:
+  - **Chips & Prompt:** IPTC Keywords / Caption-Abstract
+  - **Model Name:** TIFF Software tag (`Flux2Pro` or `Flux2KleinI2I`)
+  - **Like State:** IPTC StarRating
+- `Store.loadRuns()` reconstructs history by scanning `Documents/`, decoding PNGs, parsing IPTC fields, and sorting newest-first.
+- Working chips (in-progress prompts) are cached separately in `UserDefaults` under `engineerChips.v1`.
 
-### History Management
-The app maintains a maximum of `maxRuns` (default 30) results. When the limit is reached:
-1.  Unliked results are removed from the tail first.
-2.  If the limit is still exceeded, the oldest remaining results are removed.
-3.  Deleted results are permanently removed from disk.
+## Key Conventions & Design Choices
+- **Parallel Execution:** One tap creates `parallelRuns` independent `Task`s. Each is tracked in `inflight[Run.ID: Task]` and cancelled if the row is removed to prevent wasted API calls.
+- **Batching:** Runs are grouped into 2-second windows (`floor(createdAt / 2)`) for UI cohesion. This works both in-memory and after disk reload.
+- **Undo & Cleanup:** Removing a run adds it to `pendingUndos` with a 3-second `Task.sleep` timer. If not restored, the disk file is permanently deleted via `FileManager.removeItem`.
+- **Dynamic Layouts:** 
+  - `ChipFlowLayout` wraps chip views using custom `Layout` protocol logic.
+  - `AutoChipField` dynamically resizes text fields based on content width using a `PreferenceKey` and invisible measuring mirror.
+- **Haptics:** Tactile feedback via `UIImpactFeedbackGenerator` (soft/light) and `UINotificationFeedbackGenerator` (warning/error) for all interactive states.
+- **History Trimming:** Automatically prunes to `maxRuns` (30). Unliked rows are evicted first; oldest excess rows are removed last.
 
-## Technical Details
-
-### Persistence Strategy
-The app uses a "disk-as-index" approach for generated images.
-*   **File Naming**: `<UUID>.png`
-*   **Reading**: `Store.loadRuns()` scans the `Documents` directory, reads each PNG, extracts metadata via `ProjectService`, and reconstructs the `Run` objects.
-*   **Writing**: `Store.saveRun()` writes the image data and embeds metadata using `ProjectService.saveFile`.
-
-### Concurrency
-*   Generation tasks are tracked in an `inflight` dictionary keyed by `Run.ID`.
-*   When a result is removed, its corresponding task is cancelled to prevent unnecessary API calls and disk writes.
-*   `ImageService` uses `@unchecked Sendable` because it wraps Rust FFI calls that are not natively Sendable but are safe to call from the main actor in this context.
-
-### Error Handling
-*   **API Failures**: If the Rust FFI returns sentinel data that cannot be decoded as a `UIImage`, the row state transitions to `.failed`.
-*   **Local Errors**: Failures to read local files or decode images result in a `.failed` state and a haptic error feedback.
+## Error Handling & Resilience
+- **API Failures:** The Rust FFI returns sentinel PNGs on lib-level failure. The client checks `UIImage(data:)` decoding; if it fails, the row transitions to `.failed` state and displays a retry button.
+- **Cancellation:** `Task.checkCancellation()` is called between pipeline stages. If a row is removed mid-generation, the task exits cleanly without burning credits.
+- **Like State Sync:** If a user likes a row while it's still loading, the like state is flushed to the IPTC StarRating immediately after the file is saved in `resolveReal`.
+- **Keyboard Handling:** `scrollDismissesKeyboard(.interactively)` and a custom `.keyboard` toolbar with a `Done` button ensure smooth input flow.
