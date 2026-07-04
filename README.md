@@ -1,128 +1,136 @@
 # Engineer
 
-A SwiftUI-based prompt builder and image generation client for Flux2 models. It allows users to construct complex image prompts using modular "chips," synthesizes them via an LLM, and generates images using a Rust-backed FFI API.
+**Engineer** is a SwiftUI-based iOS application for building image generation prompts using a modular "chip" system and generating high-fidelity images via a Rust-backed API. It serves as a productionized evolution of a playground prototype, featuring disk-backed persistence, real-time chat synthesis, and a polished dark-mode interface.
 
-## Overview
+## Features
 
-**Engineer** is a productionized iOS application that evolved from a playground experiment. It serves as an "engineer screen" for building, refining, and generating AI images.
-
-### Key Features
-*   **Chip-Based Prompting**: Build prompts by adding, editing, and arranging text "chips."
-*   **LLM Synthesis**: Automatically refines raw ideas into optimized Flux2 prompts using Qwen.
-*   **Dual Generation Modes**:
-    *   **Text-to-Image**: Standard generation via Flux2Pro.
-    *   **Character Cast**: Image-to-Image generation using reference characters via Flux2KleinI2I.
-*   **Persistent History**: All generated images and prompts are saved to disk. Images are stored as PNGs with metadata (chips, model, like status) embedded directly in IPTC/XMP fields.
-*   **Batched Results**: Results are grouped by generation time for easy browsing.
-*   **Undo & Favorites**: Soft-delete with 3-second undo toast, and a "Liked" filter for quick access to favorites.
+*   **Chip-Based Prompt Builder**: Construct prompts by adding, editing, and removing individual text "chips." Supports inline editing and preset style injection.
+*   **Real-Time Generation Pipeline**:
+    *   **Chat Synthesis**: Automatically refines raw ideas into optimized prompts using the Qwen LLM.
+    *   **Image Generation**: Generates images via Flux2Pro (text-to-image) or Flux2KleinI2I (image-to-image/cast mode).
+    *   **Parallel Execution**: Generates multiple variations per tap with concurrent task management.
+*   **Disk-Backed Persistence**:
+    *   Runs and images survive app relaunches.
+    *   Metadata (chips, likes, model info) is embedded directly into PNG files using IPTC/XMP standards, eliminating the need for a separate database.
+*   **History & Management**:
+    *   View generation history grouped by time batches.
+    *   Restore previous prompts to the editor.
+    *   Like/unlike results (persisted as IPTC star ratings).
+    *   Undo recently deleted results.
+    *   Automatic history trimming to preserve storage.
+*   **Cast Mode**: Supports image-to-image generation by providing character and target reference images.
 
 ## Architecture
 
-The app follows a clean separation between UI, business logic, and persistence.
+The application follows a clean separation between the UI layer (`ContentView`), business logic (`ImageService`), and persistence (`ProjectService`, `Store`).
 
-### Core Components
+### Key Components
 
-1.  **`ContentView.swift`**: The main UI and state manager.
-    *   Manages the `chips` (prompt parts) and `runs` (generation history).
-    *   Handles the `ImageService` calls for synthesis and generation.
-    *   Implements `Store` for local persistence (UserDefaults for chips, File System for images).
-2.  **`ImageService`**: A singleton that wraps the `Api` module.
-    *   Handles authentication configuration.
-    *   Exposes async methods: `chatSynthesize`, `generate`, and `castGenerate`.
-    *   Delegates heavy lifting to the Rust FFI layer (`Api`).
-3.  **`ProjectService`**: A utility module (imported) that handles file system operations.
-    *   Saves/loads images to `Documents/`.
-    *   Reads/writes IPTC metadata (Subject, Caption, StarRating).
-    *   Manages character cast references.
-4.  **`Api`**: The Rust FFI bridge.
-    *   Static functions for calling backend services (`flux2Pro`, `qwen3_6_35b_a3b`, `flux2KleinI2I`).
-    *   Returns raw `Data` (PNG bytes).
+*   **`ContentView.swift`**: The primary UI component. Manages the state of chips, runs, and UI interactions. It handles the layout, animations, and user input.
+*   **`ImageService.swift`**: A singleton class that interfaces with the `Api` module. It handles authentication, chat synthesis, and image generation calls.
+*   **`ProjectService`**: (External Module) Handles file system operations, including saving/loading PNGs and reading/writing embedded metadata.
+*   **`Api`**: (External Module) Rust FFI bindings for calling the backend image generation and LLM services.
 
-### Data Persistence Strategy
+### Data Flow
 
-*   **Chips (Drafts)**: Stored in `UserDefaults` as JSON. This allows the prompt builder to survive app launches without being tied to a specific generation.
-*   **Runs (History)**: The disk is the source of truth.
-    *   Each generation results in a PNG file named `<UUID>.png`.
-    *   Metadata is embedded in the PNG:
-        *   **Chips**: IPTC Subject keywords.
-        *   **Prompt**: IPTC Caption/Abstract.
-        *   **Model**: TIFF Software tag.
-        *   **Liked**: IPTC StarRating.
-    *   On launch, `Store.loadRuns()` scans `Documents/`, decodes metadata from each PNG, and reconstructs the `Run` objects.
+1.  **User Input**: User adds/edit chips in the `ChipFlowLayout`.
+2.  **Generation**:
+    *   User taps "Generate".
+    *   `ImageService.chatSynthesize` is called to refine the prompt.
+    *   `ImageService.generate` or `castGenerate` is called to produce the image.
+    *   Results are saved to disk via `Store.saveRun`, embedding metadata into the PNG.
+3.  **Persistence**:
+    *   On launch, `Store.loadRuns` scans the `Documents` directory.
+    *   It reads PNG files, extracts IPTC metadata (chips, likes, model), and reconstructs the `Run` objects.
 
 ## Installation & Setup
 
 ### Prerequisites
-*   Xcode 15+
-*   iOS 17+
-*   A valid backend API user and password.
+
+*   **Xcode**: Latest stable version.
+*   **iOS Deployment Target**: iOS 16.0+ (due to SwiftUI features used).
+*   **Backend Credentials**: You must have valid credentials for the backend API.
 
 ### Configuration
-The app requires API credentials to launch. These are passed via command-line arguments when running in Xcode.
+
+The app requires authentication credentials to be passed at launch. These are not hardcoded.
 
 1.  Open the project in Xcode.
-2.  Go to **Product > Scheme > Edit Scheme...**
-3.  Select **Run** from the left sidebar, then go to the **Arguments** tab.
-4.  Under **Arguments Passed On Launch**, add:
-    *   `-u` followed by your API username.
-    *   `-p` followed by your API password.
-5.  **Example**:
-    ```text
+2.  Go to **Product > Scheme > Edit Scheme...** (or press `Cmd + <`).
+3.  Select **Run** from the left sidebar.
+4.  Navigate to the **Arguments** tab.
+5.  Under **Arguments Passed On Launch**, add the following:
+    *   `-u` followed by your **User ID**.
+    *   `-p` followed by your **Password**.
+
+    *Example:*
+    ```
     -u
     your-username-here
     -p
     your-password-here
     ```
 
-> **Note**: If these arguments are missing, the app will crash on launch with a `preconditionFailure`. This is intentional to prevent silent failures or 401 errors during development.
+> **Note**: If these arguments are missing, the app will crash on launch with a `preconditionFailure` to prevent silent authentication errors.
 
 ## Usage
 
-### Building a Prompt
-1.  Tap the **+ add** button to create a new chip.
-2.  Type a phrase (e.g., "Cinematic", "Neon lights") and press **Next** or **Done**.
-3.  Tap any existing chip to edit its text.
-4.  Tap the **x** on a chip to remove it.
-5.  Use the **Presets** rail (e.g., "Moody", "Surreal") to quickly add common style descriptors.
+### Building Prompts
+
+1.  **Add Chips**: Tap the `+ add` button to create a new text chip. Type your phrase and press "Next" or "Done" to add it.
+2.  **Edit Chips**: Tap any existing chip to enter inline editing mode. Modify the text and press "Done" to save.
+3.  **Remove Chips**: Tap the `x` on a chip to remove it.
+4.  **Presets**: Use the horizontal scrollable rail to quickly insert style presets (e.g., "Cinematic", "Neon", "Moody").
+5.  **Clear All**: Tap "CLEAR" in the header to reset the prompt.
 
 ### Generating Images
-1.  Ensure at least one chip is present.
-2.  Tap the **Generate** button.
-    *   This fans out `parallelRuns` (default 3) generation tasks.
-    *   Each run first calls the LLM to synthesize a detailed prompt from your chips.
-    *   Then, it generates the image using the configured model (Flux2Pro or Flux2KleinI2I if character cast is set).
-3.  Results appear in the **RESULTS** section with a shimmer loading effect.
 
-### Managing History
-*   **Restore**: Tap any past result row to load its prompt back into the editor.
-*   **Like**: Tap the heart icon to favorite a result. Liked results are preserved when history is trimmed.
-*   **Remove**: Tap the **x** in a result row to delete it.
-    *   A toast appears at the bottom with an **Undo** button.
-    *   If not undone within 3 seconds, the image file is permanently deleted from disk.
-*   **Filter**: Tap the **LIKED** chip in the results header to toggle between showing all results or only favorites.
+1.  Ensure you have at least one chip in the prompt editor.
+2.  Tap the **Generate** button at the bottom.
+3.  The app will:
+    *   Send your chips to the chat synthesizer.
+    *   Generate `parallelRuns` (default 3) images.
+    *   Display loading shimmer effects for each result.
+    *   Show the generated images once ready.
+
+### Managing Results
+
+*   **Restore**: Tap any result row to load its prompt back into the editor.
+*   **Like**: Tap the heart icon to like a result. This persists the like status to the file.
+*   **Retry**: Tap the retry icon on a failed or loaded result to regenerate it.
+*   **Remove**: Tap the `x` icon to remove a result. A toast notification appears with an "Undo" button for 3 seconds.
+*   **Filter**: Tap the "LIKED" chip in the Results header to toggle between showing all results or only liked ones.
 
 ## Key Files
 
-| File | Description |
-| :--- | :--- |
-| `Prod/ContentView.swift` | Main view, state management, persistence logic (`Store`), and UI components. |
-| `Prod/ProdApp.swift` | App entry point. Handles argument parsing for API credentials. |
-| `Api/` | (External Module) Rust FFI bindings for backend API calls. |
-| `ProjectService/` | (External Module) File system and IPTC metadata utilities. |
+*   `Prod/ContentView.swift`: Main UI logic, models (`Chip`, `Run`, `RunBatch`), persistence store (`Store`), and image service integration.
+*   `Prod/ProdApp.swift`: App entry point, handles launch argument parsing for credentials.
+*   `Api/`: (External) Rust FFI bindings for backend communication.
+*   `ProjectService/`: (External) File system and metadata handling.
 
 ## Technical Details
 
+### Persistence Strategy
+
+The app uses a "file-as-database" approach. Each generated image is a PNG file in the `Documents` directory. Metadata is embedded using IPTC/XMP standards:
+
+*   **Chips**: Stored as IPTC Subject keywords.
+*   **Prompt**: Stored as IPTC Caption/Abstract.
+*   **Model Name**: Stored as TIFF Software tag.
+*   **Like Status**: Stored as IPTC StarRating.
+*   **Creation Date**: Derived from the file's creation date.
+
+This allows the app to reconstruct the entire history of runs simply by scanning the directory, without needing a separate SQLite or Core Data store.
+
 ### Concurrency
-*   Generation tasks are wrapped in `Task` objects and stored in an `inflight` dictionary keyed by `Run.ID`.
-*   If a user removes a result while it is still generating, the corresponding task is cancelled to save API credits and bandwidth.
+
+*   **Async/Await**: All API calls are asynchronous.
+*   **Task Management**: In-flight generation tasks are tracked in a dictionary (`inflight`). When a result is removed, the corresponding task is cancelled to prevent unnecessary API calls and resource usage.
+*   **Main Actor**: UI updates are performed on the main actor to ensure thread safety.
 
 ### UI Conventions
-*   **Dark Mode**: The app is designed for dark mode (`preferredColorScheme(.dark)`).
-*   **Haptics**: Subtle haptic feedback is used for taps, edits, and generation completion.
-*   **Animations**: Spring animations are used for chip additions/removals and result row transitions.
-*   **Scroll Behavior**: The prompt editor can scroll out of view. A floating pill appears to allow quick scrolling back to the editor.
 
-### Error Handling
-*   If image decoding fails (e.g., corrupted data), the row state becomes `.failed`.
-*   Failed rows display a warning icon and offer a **Retry** button.
-*   Network or API errors are caught and surface as `.failed` states without crashing the app.
+*   **Dark Mode**: The app is designed for dark mode with a black background and subtle gradient accents.
+*   **Animations**: Uses spring animations for smooth transitions when adding/removing chips or results.
+*   **Haptics**: Provides haptic feedback for user interactions (taps, removals, errors).
+*   **Accessibility**: Includes accessibility labels and hints for screen readers.
