@@ -4,7 +4,7 @@
     ExperimentalLayoutApi::class,
 )
 
-package market.femi.screen
+package market.femi.engineer.screen
 
 // Engineer screen — chip-list prompt builder + result history. Verbatim port of
 // ImageIterate2/Prod/ContentView.swift. Real backend (chat synthesize → generate)

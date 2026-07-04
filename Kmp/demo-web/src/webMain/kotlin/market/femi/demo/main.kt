@@ -2,7 +2,7 @@ package market.femi.demo
 
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.window.ComposeViewport
-import market.femi.screen.Engineer
+import market.femi.engineer.screen.Engineer
 
 // Standalone browser host for the Engineer screen — the web analog of the
 // android :demo MainActivity. Renders the library's Engineer composable full

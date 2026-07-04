@@ -1,132 +1,143 @@
-# Engineer
+# ImageIterate2
 
-A SwiftUI-based image generation client that combines prompt engineering with a persistent history of results. It allows users to build complex prompts using modular "chips," synthesizes them via AI, and generates images using a Rust-backed FFI API.
+**ImageIterate2** is a cross-platform AI image generation and iteration tool. It provides a "chip-list" prompt builder that allows users to compose complex prompts from modular phrases, then generates multiple variations using a two-stage pipeline: LLM chat synthesis followed by text-to-image generation.
 
-## Overview
-
-**Engineer** is a productionized iOS application designed for iterative image generation. It evolved from a playground prototype into a full app with disk-backed persistence and real backend integration.
-
-### Key Features
-*   **Chip-Based Prompt Builder**: Construct prompts by adding, editing, and arranging text "chips."
-*   **AI Synthesis**: Automatically refines raw ideas into optimized prompts using the Qwen model before generation.
-*   **Dual Generation Modes**:
-    *   **Text-to-Image**: Uses Flux2Pro for standard generation.
-    *   **Cast Mode**: Uses Flux2KleinI2I for image-to-image generation using reference characters/targets.
-*   **Persistent History**: All generated images and their associated metadata (chips, likes, model info) are saved to disk as PNGs with embedded IPTC/XMP metadata.
-*   **Smart History Management**: Results are grouped into batches based on generation time. The history is automatically trimmed to a maximum count, prioritizing "liked" items.
-*   **Undo Support**: Accidental removal of results can be undone via a toast notification.
+The project is structured as a multi-platform codebase:
+- **SwiftUI (iOS/macOS):** A polished, dark-mode-first interface with ambient glow effects, haptic feedback, and disk-backed persistence.
+- **Kotlin Multiplatform (Android/Web):** A Compose-based implementation (`Engineer`) that mirrors the SwiftUI logic, supporting both native Android and browser (Web) targets.
+- **Playground:** A standalone SwiftUI prototype for rapid UI iteration.
 
 ## Architecture
 
-The app follows a clean separation between UI, business logic, and persistence.
+The application follows a strict separation between UI, State Management, and Backend Services.
 
-### Core Components
+### Core Flow
+1.  **Prompt Engineering:** Users build prompts by adding "Chips" (phrases) or selecting Presets.
+2.  **Generation:** Tapping "Generate" fans out `parallelRuns` (default 3) concurrent tasks.
+3.  **Synthesis:** Each task calls `qwen3_6_35b_a3b` (LLM) to refine the prompt.
+4.  **Image Gen:** Each task calls `flux2Pro` (or `flux2KleinI2I` for cast mode) to generate the image.
+5.  **Persistence:** Results are saved to disk (`ProjectService` on iOS/Android, OPFS on Web) with metadata (chips, likes) embedded in image EXIF/IPTC/XMP.
 
-1.  **`ContentView.swift`**: The main UI entry point.
-    *   Manages the state of `Chip`s (the prompt builder) and `Run`s (generation history).
-    *   Handles the `ImageService` interactions.
-    *   Implements custom layouts (`ChipFlowLayout`) and animations.
-2.  **`ImageService.swift`**: A singleton that wraps the `Api` module.
-    *   Handles authentication configuration.
-    *   Provides async methods for `chatSynthesize`, `generate`, and `castGenerate`.
-    *   Abstracts the Rust FFI calls (`Api.flux2Pro`, `Api.qwen3_6_35b_a3b`, etc.).
-3.  **`ProjectService`**: (External Module)
-    *   Handles file system operations.
-    *   Manages reading/writing PNGs with embedded metadata (IPTC keywords for chips, StarRating for likes).
-    *   Provides URLs for local assets.
-4.  **`Api`**: (External Module)
-    *   Rust FFI bindings for backend services.
-    *   No URLSession or OpenAPI clients; direct static functions returning `Data`.
+### Key Components
 
-### Data Persistence Strategy
+#### 1. Persistence (`Store` / `EngineerStore`)
+- **iOS (`Prod/ContentView.swift`):** Uses `ProjectService` for file I/O and `UserDefaults` for the working chip set. Images are stored as PNGs in the Documents directory.
+- **Android (`Kmp/engineer/src/androidMain/...`):** Uses `ProjectService` for file I/O and `SharedPreferences` for chips.
+- **Web (`Kmp/engineer/src/webMain/...`):** Uses OPFS (Origin Private File System) via `ProjectService` and `localStorage` for chips.
 
-*   **Chips (Prompt Builder)**: Stored in `UserDefaults` as JSON. This allows the user's current draft to survive app launches without being treated as a "generation."
-*   **Runs (History)**: Stored as individual PNG files in the app's `Documents` directory.
-    *   **Filename**: `<UUID>.png`.
-    *   **Metadata**: Embedded in the PNG file using IPTC/XMP standards.
-        *   `Subject`: Chip texts.
-        *   `Caption/Abstract`: Joined prompt.
-        *   `Software`: Model name used (e.g., "Flux2Pro").
-        *   `StarRating`: Like status.
-    *   **Indexing**: The app scans the `Documents` directory on launch to reconstruct the `runs` array. The file creation date is used for sorting and batching.
+#### 2. Image Service
+- **Swift (`ImageService` in `ContentView.swift`):** Wraps the `Api` package (Rust FFI). Handles authentication and parallel task groups.
+- **Kotlin (`ImageService` in `ContentView.kt` / `Engineer.kt`):** Direct suspend functions calling Rust FFI. No HTTP client; handles base64 encoding for cast mode internally.
 
-## Installation & Setup
+#### 3. UI Components
+- **Chip Flow:** A custom `FlowLayout` (Swift) or `FlowRow` (Compose) that wraps chips. Supports inline editing and auto-sizing text fields.
+- **Result Rows:** Display thumbnails with shimmer placeholders during loading. Support "Like" (heart) and "Retry" actions.
+- **Ambient Background:** Radial gradients that shift color based on the dominant color of the current hero image (Swift) or static palettes (Kotlin).
+
+## Project Structure
+
+```text
+.
+├── ImageIterate2/          # SwiftUI Demo App (ImageIterate2 target)
+│   ├── ContentView.swift   # Main UI for the demo (single image iteration)
+│   └── ImageIterate2App.swift
+├── Prod/                   # Production SwiftUI Library/App (Prod target)
+│   ├── ContentView.swift   # Engineer screen: Chip builder + History
+│   └── ProdApp.swift
+├── Playground/             # SwiftUI Prototype (Playground target)
+│   ├── ContentView.swift   # Mocked generation for UI testing
+│   └── PlaygroundApp.swift
+├── Kmp/                    # Kotlin Multiplatform
+│   ├── engineer/           # Core Engineer screen logic
+│   │   ├── src/androidMain/.../ContentView.kt  # Android Compose UI
+│   │   └── src/webMain/.../Engineer.kt         # Web Compose UI
+│   └── demo/               # Android Demo App
+│       └── src/main/.../MainActivity.kt
+├── Tests/                  # Unit/Smoke Tests
+│   └── ProdTests/ApiSmokeTests.swift
+└── Package.swift           # Swift Package Manager manifest
+```
+
+## Installation & Build
 
 ### Prerequisites
-*   Xcode 15+
-*   iOS 17+
-*   A valid backend API user and password.
+- **Xcode 15+** (for Swift 6.2 support)
+- **Android Studio** (for KMP Android builds)
+- **Rust Toolchain** (required by the `Api` dependency for FFI)
 
-### Configuration
-The application requires authentication credentials to be passed at launch. These are **not** hardcoded.
+### Swift Package Manager
+The project uses SPM. Open `Package.swift` or the root `.xcodeproj` (if generated) in Xcode.
 
-1.  Open the project in Xcode.
-2.  Go to **Product > Scheme > Edit Scheme...**
-3.  Select **Run** from the left sidebar.
-4.  Navigate to the **Arguments** tab.
-5.  Under **Arguments Passed On Launch**, add the following:
-    *   `-u` followed by your API username.
-    *   `-p` followed by your API password.
+Dependencies:
+- `swiftapi`: Custom API client (Rust FFI).
+- `swift-project-service`: Disk persistence layer.
 
-    *Example:*
-    ```text
-    -u
-    your-username-here
-    -p
-    your-password-here
-    ```
-
-**Note**: If these arguments are missing, the app will crash on launch with a `preconditionFailure` to prevent silent authentication errors.
+### Kotlin Multiplatform
+The KMP module is integrated via Gradle. Ensure you have the Android SDK and Kotlin Multiplatform plugins configured.
 
 ## Usage
 
-### Building a Prompt
-1.  Tap the **+ add** button to create a new chip.
-2.  Type your phrase and press **Next** or **Done**.
-3.  Tap any existing chip to edit its text.
-4.  Tap the **x** on a chip to remove it.
-5.  Use the **Presets** rail (e.g., "Cinematic", "Neon") to quickly insert common style descriptors.
-6.  Tap **CLEAR** to reset the entire prompt.
+### Running the SwiftUI Demo (`ImageIterate2`)
+1.  Open the project in Xcode.
+2.  Select the `ImageIterate2` scheme.
+3.  Go to **Edit Scheme → Run → Arguments**.
+4.  Add the following arguments:
+    -   `-u` followed by your API user ID.
+    -   `-p` followed by your API password.
+5.  Run the app. It will load a demo image and allow you to iterate on it.
 
-### Generating Images
-1.  Ensure at least one chip is present.
-2.  Tap the **Generate** button.
-    *   This triggers `parallelRuns` (default 3) concurrent generations.
-    *   Each run first sends the prompt to the Qwen model for synthesis.
-    *   The synthesized prompt is then sent to the image generation model (Flux2Pro or Flux2KleinI2I depending on configuration).
-3.  New rows appear in the **RESULTS** section with a shimmering loading state.
+### Running the Production SwiftUI App (`Prod`)
+1.  Select the `Prod` scheme.
+2.  Add launch arguments `-u <user>` and `-p <password>` as above.
+3.  Run. This version includes full history persistence and disk storage.
 
-### Managing Results
-*   **Restore**: Tap any result row to load its prompt back into the editor.
-*   **Like**: Tap the heart icon to mark a result as a favorite. Liked items are preserved when history is trimmed.
-*   **Retry**: Tap the refresh icon on a failed or loaded result to regenerate it.
-*   **Remove**: Tap the x icon on a result. A toast appears allowing you to **Undo** the removal within 3 seconds. If not undone, the file is deleted from disk.
-*   **Filter**: Tap the **LIKED** chip in the Results header to toggle between showing all results or only liked ones.
+### Running the Android Demo
+1.  Connect an Android device or start an emulator.
+2.  Run the `demo` module.
+3.  Credentials are hardcoded in `MainActivity.kt` for demo purposes.
 
-## Key Files
+### Running the Web Demo
+1.  Run the `demo-web` module (requires Node.js environment).
+2.  Open the generated HTML/JS in a browser.
+3.  Credentials are hardcoded in `main.kt`.
 
-| File | Description |
-| :--- | :--- |
-| `Prod/ContentView.swift` | Main view, state management, persistence logic (`Store`), and UI components. |
-| `Prod/ProdApp.swift` | App entry point, handles command-line argument parsing for credentials. |
-| `Api` (Module) | Rust FFI bindings for backend API calls. |
-| `ProjectService` (Module) | File system and metadata handling utilities. |
+## Key Features
 
-## Technical Details
+### Prompt Engineering
+- **Chips:** Modular phrases that can be edited, removed, or reordered.
+- **Presets:** Quick-insert buttons for common styles (Cinematic, Neon, Moody, etc.).
+- **Auto-Size Fields:** Text fields expand to fit content up to a max width.
 
-### Concurrency
-*   Generation tasks are tracked in an `inflight` dictionary keyed by `Run.ID`.
-*   If a user removes a result while it is still generating, the corresponding `Task` is cancelled to prevent unnecessary API calls and memory usage.
-*   `ImageService` is marked `@unchecked Sendable` due to its internal mutable state (credentials), but access is synchronized via the singleton pattern and main-thread dispatch where necessary.
+### Generation
+- **Parallel Execution:** Generates 3 images simultaneously by default.
+- **Cast Mode:** Supports image-to-image generation using character and target reference images (Android/Web only currently).
+- **Retry:** Failed rows can be retried individually.
 
-### Metadata Embedding
-The app relies on `ProjectService` to embed metadata into PNGs. This allows the app to be stateless regarding history storage—the disk file itself is the source of truth.
-*   **Chips**: Stored as IPTC `Subject` keywords.
-*   **Like Status**: Stored as IPTC `StarRating`.
-*   **Model**: Stored as TIFF `Software`.
+### History & Persistence
+- **Disk-Backed:** All generations are saved to disk. History survives app restarts.
+- **Metadata:** Chips and "Like" status are embedded in the image file metadata (IPTC/XMP).
+- **Trimming:** History is capped at 30 runs. Unliked runs are evicted first.
 
-### UI Conventions
-*   **Dark Mode**: The app is designed for dark mode (`preferredColorScheme(.dark)`).
-*   **Haptics**: Subtle haptic feedback is used for taps, edits, and errors via `UIImpactFeedbackGenerator` and `UINotificationFeedbackGenerator`.
-*   **Animations**: Spring animations are used for chip additions/removals and row transitions to provide a fluid feel.
-*   **Accessibility**: All interactive elements have `accessibilityLabel` and `accessibilityHint` attributes.
+### UI/UX
+- **Dark Mode:** Default dark theme with purple/pink accent gradients.
+- **Haptics:** Subtle haptic feedback on button presses and state changes.
+- **Undo:** Removing a result row triggers a 3-second undo toast.
+- **Liked Filter:** Toggle to view only favorited results.
+
+## Non-Obvious Conventions
+
+1.  **Filename Chaining:** The server-side filename is preserved and passed to the next generation call to maintain context. This filename is internal-only and not exposed to the user.
+2.  **Data vs. Image:** The app stores both the raw `Data` (bytes) and the decoded `UIImage`/`ImageBitmap`. The raw data is used for re-uploading or chaining to avoid re-encoding artifacts.
+3.  **Batching:** Results are grouped into "batches" based on a 2-second window of their creation timestamp. This visually groups results from a single "Generate" tap.
+4.  **Credit Cost:** The UI displays a credit cost per generation (`parallelRuns * creditPerRun`). This is informational; actual billing is handled by the backend.
+5.  **Web OPFS:** On web, images are stored in the Origin Private File System. The app lazily decodes images only when they become visible in the list to prevent memory issues with large history.
+
+## Testing
+
+### API Smoke Tests
+Located in `Tests/ProdTests/ApiSmokeTests.swift`. These tests hit the real API to verify authentication and response formats.
+
+1.  Set environment variables in the Xcode Test scheme:
+    -   `TEST_USER`
+    -   `TEST_PASSWORD`
+2.  Run the tests. They will skip if credentials are missing.
