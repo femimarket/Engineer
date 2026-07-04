@@ -7,18 +7,43 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		14D996EB2FE58291002C5CF6 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 14D996EA2FE58291002C5CF6 /* Api */; };
-		14D996ED2FE582A8002C5CF6 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 14D996EC2FE582A8002C5CF6 /* Api */; };
+		1425D1DF2FF3E5B3004F8F00 /* ImageIterate2.app in Resources */ = {isa = PBXBuildFile; fileRef = 14F0D4422FDD6B1400ABD6BB /* ImageIterate2.app */; };
+		1425D1E22FF3E5B8004F8F00 /* Playground.app in Resources */ = {isa = PBXBuildFile; fileRef = 1475AB112FDF041C00C86271 /* Playground.app */; };
+		1425D1F52FF3E6A3004F8F00 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 1425D1F42FF3E6A3004F8F00 /* Api */; };
+		1425D1F72FF3E72E004F8F00 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 1425D1F62FF3E72E004F8F00 /* Api */; };
 		14D998982FE5A745002C5CF6 /* ProjectService in Frameworks */ = {isa = PBXBuildFile; productRef = 14D998972FE5A745002C5CF6 /* ProjectService */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXContainerItemProxy section */
+		1425D1E02FF3E5B3004F8F00 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 14F0D43A2FDD6B1400ABD6BB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 14F0D4412FDD6B1400ABD6BB;
+			remoteInfo = ImageIterate2;
+		};
+		1425D1E32FF3E5B8004F8F00 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 14F0D43A2FDD6B1400ABD6BB /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1475AB102FDF041C00C86271;
+			remoteInfo = Playground;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		1425D1EE2FF3E647004F8F00 /* Api2 */ = {isa = PBXFileReference; lastKnownFileType = wrapper; name = Api2; path = /Users/u/swiftapps/Api2; sourceTree = "<absolute>"; };
 		1475AB112FDF041C00C86271 /* Playground.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Playground.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14F0D4422FDD6B1400ABD6BB /* ImageIterate2.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageIterate2.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		14F0D61C2FDF5711005DEEA5 /* Prod.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Prod.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		144C74382FF913C900F25806 /* Kmp */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = Kmp;
+			sourceTree = "<group>";
+		};
 		1475AB122FDF041C00C86271 /* Playground */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = Playground;
@@ -48,7 +73,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14D996ED2FE582A8002C5CF6 /* Api in Frameworks */,
+				1425D1F52FF3E6A3004F8F00 /* Api in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -57,7 +82,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				14D998982FE5A745002C5CF6 /* ProjectService in Frameworks */,
-				14D996EB2FE58291002C5CF6 /* Api in Frameworks */,
+				1425D1F72FF3E72E004F8F00 /* Api in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -67,6 +92,7 @@
 		14F0D4392FDD6B1400ABD6BB = {
 			isa = PBXGroup;
 			children = (
+				144C74382FF913C900F25806 /* Kmp */,
 				14F0D4442FDD6B1400ABD6BB /* ImageIterate2 */,
 				1475AB122FDF041C00C86271 /* Playground */,
 				14F0D61D2FDF5711005DEEA5 /* Prod */,
@@ -88,6 +114,7 @@
 		14F0D6272FDF5738005DEEA5 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				1425D1EE2FF3E647004F8F00 /* Api2 */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -130,11 +157,12 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
+				144C74382FF913C900F25806 /* Kmp */,
 				14F0D4442FDD6B1400ABD6BB /* ImageIterate2 */,
 			);
 			name = ImageIterate2;
 			packageProductDependencies = (
-				14D996EC2FE582A8002C5CF6 /* Api */,
+				1425D1F42FF3E6A3004F8F00 /* Api */,
 			);
 			productName = ImageIterate2;
 			productReference = 14F0D4422FDD6B1400ABD6BB /* ImageIterate2.app */;
@@ -151,14 +179,16 @@
 			buildRules = (
 			);
 			dependencies = (
+				1425D1E12FF3E5B3004F8F00 /* PBXTargetDependency */,
+				1425D1E42FF3E5B8004F8F00 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				14F0D61D2FDF5711005DEEA5 /* Prod */,
 			);
 			name = Prod;
 			packageProductDependencies = (
-				14D996EA2FE58291002C5CF6 /* Api */,
 				14D998972FE5A745002C5CF6 /* ProjectService */,
+				1425D1F62FF3E72E004F8F00 /* Api */,
 			);
 			productName = Prod;
 			productReference = 14F0D61C2FDF5711005DEEA5 /* Prod.app */;
@@ -195,8 +225,8 @@
 			mainGroup = 14F0D4392FDD6B1400ABD6BB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				14D996E92FE58291002C5CF6 /* XCRemoteSwiftPackageReference "swiftapi" */,
 				14D998962FE5A745002C5CF6 /* XCRemoteSwiftPackageReference "swift-project-service" */,
+				1425D1F12FF3E69C004F8F00 /* XCRemoteSwiftPackageReference "swiftapi" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 14F0D4432FDD6B1400ABD6BB /* Products */;
@@ -229,6 +259,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				1425D1DF2FF3E5B3004F8F00 /* ImageIterate2.app in Resources */,
+				1425D1E22FF3E5B8004F8F00 /* Playground.app in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -257,6 +289,19 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		1425D1E12FF3E5B3004F8F00 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 14F0D4412FDD6B1400ABD6BB /* ImageIterate2 */;
+			targetProxy = 1425D1E02FF3E5B3004F8F00 /* PBXContainerItemProxy */;
+		};
+		1425D1E42FF3E5B8004F8F00 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1475AB102FDF041C00C86271 /* Playground */;
+			targetProxy = 1425D1E32FF3E5B8004F8F00 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		1475AB1A2FDF041D00C86271 /* Debug */ = {
@@ -614,7 +659,7 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		14D996E92FE58291002C5CF6 /* XCRemoteSwiftPackageReference "swiftapi" */ = {
+		1425D1F12FF3E69C004F8F00 /* XCRemoteSwiftPackageReference "swiftapi" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/femimarket/swiftapi";
 			requirement = {
@@ -633,14 +678,14 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		14D996EA2FE58291002C5CF6 /* Api */ = {
+		1425D1F42FF3E6A3004F8F00 /* Api */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 14D996E92FE58291002C5CF6 /* XCRemoteSwiftPackageReference "swiftapi" */;
+			package = 1425D1F12FF3E69C004F8F00 /* XCRemoteSwiftPackageReference "swiftapi" */;
 			productName = Api;
 		};
-		14D996EC2FE582A8002C5CF6 /* Api */ = {
+		1425D1F62FF3E72E004F8F00 /* Api */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 14D996E92FE58291002C5CF6 /* XCRemoteSwiftPackageReference "swiftapi" */;
+			package = 1425D1F12FF3E69C004F8F00 /* XCRemoteSwiftPackageReference "swiftapi" */;
 			productName = Api;
 		};
 		14D998972FE5A745002C5CF6 /* ProjectService */ = {

@@ -78,7 +78,8 @@ public struct ContentView: View {
     /// - onCommit: fires once on dismiss with the kept image's raw bytes.
     public init(
         initialImagePath: String,
-        bearer: String,
+        user: String,
+        password: String,
         onCommit: @escaping (_ heroData: Data, _ heroFilename: String) -> Void
     ) {
         guard let data = try? Data(contentsOf: URL(fileURLWithPath: initialImagePath)),
@@ -92,7 +93,7 @@ public struct ContentView: View {
         _heroData = State(initialValue: data)
         _heroFile = State(initialValue: basename)
         _heroTint = State(initialValue: ContentView.dominantColor(of: img))
-        ImageService.configure(bearer: bearer)
+        ImageService.configure(user: user, password: password)
     }
     @State private var history: [UIImage] = []
     /// Original bytes of each prior hero, parallel to `history`. Lets revert
@@ -823,26 +824,21 @@ nonisolated private func scrub(_ s: String) -> String {
     return out
 }
 
-// MARK: - Image Service — wraps the generated `Api` package
+// MARK: - Image Service — wraps the direct Api package (Rust FFI under the hood)
 //
 // Flow:
-//   1. POST /api with action=.typeClaudeSonnet46(...) carrying the synthesizer
-//      prompt → returns API whose action's last assistant message is the
-//      generation prompt.
-//   2. POST /api with action=.typeZImageTurbo(prompt) → returns API with
-//      status=.completed and `file` populated as base64 image bytes.
-//   3. Base64-decode `file` → UIImage.
+//   1. Api.qwen3_6_35b_a3b — chat synthesis, returns assistant prompt.
+//   2. Api.flux2Pro — text-to-image, returns image Data inline (no polling).
+//   3. UIImage(data:) — decode the bytes for display.
 
 enum ImageServiceError: LocalizedError {
     case requestFailed(String)
     case decodingFailed
-    case taskFailed
 
     var errorDescription: String? {
         switch self {
-        case .requestFailed(let s):  return s
-        case .decodingFailed:        return "couldn't read result"
-        case .taskFailed:            return "generation failed"
+        case .requestFailed(let s): return s
+        case .decodingFailed:       return "couldn't read result"
         }
     }
 }
@@ -850,34 +846,28 @@ enum ImageServiceError: LocalizedError {
 final class ImageService: @unchecked Sendable {
     static let shared = ImageService()
 
-    private var bearer: String = ""
+    private var user: String = ""
+    private var password: String = ""
 
     private init() {}
 
-    /// Injects the auth bearer at startup. Called from `ContentView.init`.
-    /// Source the bearer from Keychain or a server-issued session — never from
-    /// a literal in source code in production.
-    static func configure(bearer: String) {
-        shared.bearer = bearer
-        ApiAPIConfiguration.shared.customHeaders["Authorization"] = "Bearer \(bearer)"
-        log("INIT", "basePath=\(ApiAPIConfiguration.shared.basePath) bearer=\(bearer.prefix(8))…")
+    static func configure(user: String, password: String) {
+        shared.user = user
+        shared.password = password
+        log("INIT", "user=\(user.prefix(8))…")
     }
 
-    /// Result of a single generation: the decoded image, the original encoded
-    /// bytes (kept so the dismissal callback can return them without re-encoding),
-    /// and the server-side filename for chaining the next iteration.
+    /// Result of a single generation: the decoded image plus the bytes returned
+    /// from the API and a synthetic filename for chaining the next iteration.
     struct GenerationResult {
         let image: UIImage
         let data: Data
         let filename: String
     }
 
-    /// Flow per slot:
-    /// 1. Chat call — sends the user's idea, returns ONE synthesized prompt
-    ///    (LLM temperature gives each slot a distinct creative interpretation).
-    /// 2. Generate call — uses that synthesized prompt to produce one image.
-    /// N slots run end-to-end in parallel, giving creative entropy across the
-    /// results without unstructured-text parsing.
+    /// N slots run end-to-end in parallel: each does chat synthesis → image
+    /// generation. LLM temperature gives each slot a different creative
+    /// interpretation of the same seed idea.
     func generate(prompt: String, count: Int) async throws -> [GenerationResult] {
         log("FANOUT", "spawn \(count) end-to-end (chat→generate) slots")
         return try await withThrowingTaskGroup(of: Result<GenerationResult, Error>.self) { group in
@@ -906,11 +896,7 @@ final class ImageService: @unchecked Sendable {
                 case .failure(let err): if firstError == nil { firstError = err }
                 }
             }
-            let errSummary: String = {
-                guard let e = firstError else { return "none" }
-                return (e as? ImageServiceError)?.errorDescription ?? (e as NSError).localizedDescription
-            }()
-            log("FANOUT DONE", "success=\(results.count)/\(count) firstError=\(errSummary)")
+            log("FANOUT DONE", "success=\(results.count)/\(count)")
             if results.isEmpty {
                 throw firstError ?? ImageServiceError.requestFailed("no images returned")
             }
@@ -918,14 +904,6 @@ final class ImageService: @unchecked Sendable {
         }
     }
 
-    /// Sends the user's idea to chat and gets back exactly one synthesized
-    /// generation prompt. LLM temperature provides natural variation when
-    /// this is called N times in parallel with the same input — each return
-    /// is a different creative interpretation of the same seed idea.
-    ///
-    /// Chat input goes via `messages` only. The `prompt:` field is left empty
-    /// for the chat request — it's an image-gen field that the server echoes
-    /// back unchanged, which would otherwise mask the synthesized output.
     private func chatSynthesize(idea: String, slot: Int) async throws -> String {
         let userIdea = idea.isEmpty ? "Surprise me — generate something interesting." : idea
         log("[slot \(slot)] CHAT", "→ idea.len=\(userIdea.count)")
@@ -934,98 +912,34 @@ final class ImageService: @unchecked Sendable {
             Make image prompt frame for Flux2. Reply with only the prompt, nothing else.
             Idea: \(userIdea)
             """
-
-        let chatAction: ApiAction = .typeClaudeSonnet46(ClaudeSonnet46(
-            messages: [ApiChatMessage(content: synthesizerRequest, role: .user)],
-            type: .claudesonnet46
-        ))
-        let response = try await call(chatAction, id: UUID(), slot: slot)
-
-        // The synthesized prompt comes back as the last assistant message inside
-        // the response action. Fall back to the original idea as last-resort so
-        // generation never blocks on parsing.
-        let synthesized: String = {
-            if case .typeClaudeSonnet46(let chat) = response.action,
-               let last = chat.messages.last(where: { $0.role == .assistant })?.content,
-               !last.isEmpty {
-                return last
-            }
-            return userIdea
-        }()
-        log("[slot \(slot)] CHAT OK", "synthesized.len=\(synthesized.count) (same as input: \(synthesized == userIdea))")
-        return synthesized
+        let messages = await Api.qwen3_6_35b_a3b(
+            user: user,
+            password: password,
+            messages: [(role: .user, content: synthesizerRequest)]
+        )
+        if let last = messages.last(where: { $0.role == .assistant })?.content,
+           !last.isEmpty {
+            log("[slot \(slot)] CHAT OK", "synthesized.len=\(last.count)")
+            return last
+        }
+        log("[slot \(slot)] CHAT FALLBACK", "no assistant content; using original idea")
+        return userIdea
     }
 
     private func singleGenerate(prompt: String, slot: Int) async throws -> GenerationResult {
-        log("[slot \(slot)] GEN", "POST /api action=ZImageTurbo prompt.len=\(prompt.count)")
+        log("[slot \(slot)] GEN", "Api.flux2Pro prompt.len=\(prompt.count)")
         let id = UUID()
-        let result = try await call(.typeZImageTurbo(ZImageTurbo(
-            falRequestId: "", file: "", prompt: prompt, type: .zimageturbo
-        )), id: id, slot: slot)
-        log("[slot \(slot)] GEN OK", "status=\(result.status.rawValue)")
-
-        guard result.status == .completed else {
-            log("[slot \(slot)] GEN FAIL", "final status=\(result.status.rawValue)")
-            throw ImageServiceError.taskFailed
-        }
-        guard case .typeZImageTurbo(let zit) = result.action else {
-            log("[slot \(slot)] GEN FAIL", "unexpected action in response")
-            throw ImageServiceError.decodingFailed
-        }
-
-        log("[slot \(slot)] DECODE", "base64 len=\(zit.file.count)")
-        let (img, data) = try Self.decodeBase64Image(zit.file)
-        return GenerationResult(image: img, data: data, filename: "\(id.uuidString).png")
-    }
-
-    private func call(_ action: ApiAction, id: UUID, slot: Int) async throws -> API {
-        let tag = "[slot \(slot)]"
-        log(tag, "→ POST \(ApiAPIConfiguration.shared.basePath)/api id=\(id)")
-        let req = API(
-            action: action,
-            credit: 0,
-            id: id,
-            status: .pending,
-            userId: ""
+        let data = await Api.flux2Pro(
+            user: user,
+            password: password,
+            prompt: prompt
         )
-        do {
-            let result = try await ApiHandlerAPI.apiHandler(API: req)
-            log(tag, "← OK status=\(result.status.rawValue)")
-            return result
-        } catch let ErrorResponse.error(status, data, _, underlying) {
-            let bodyRaw = data.flatMap { String(data: $0, encoding: .utf8) } ?? "<no body>"
-            let body = scrub(bodyRaw)
-            let nsErr = underlying as NSError
-            log(tag, """
-                ← FAIL httpStatus=\(status) err=\(nsErr.domain):\(nsErr.code) (\(nsErr.localizedDescription))
-                       body[\(bodyRaw.count)]=\(body.prefix(300))
-                """)
-            let msg: String
-            if status > 0 {
-                msg = "HTTP \(status) — \(body.prefix(160))"
-            } else {
-                msg = "\(nsErr.domain) \(nsErr.code): \(nsErr.localizedDescription)"
-            }
-            throw ImageServiceError.requestFailed(msg)
-        }
-    }
-
-    /// Decodes the model `file` field (base64, optionally prefixed with a
-    /// data URI scheme) into raw PNG bytes plus a UIImage.
-    static func decodeBase64Image(_ encoded: String) throws -> (UIImage, Data) {
-        let stripped: String
-        if let comma = encoded.firstIndex(of: ",") {
-            stripped = String(encoded[encoded.index(after: comma)...])
-        } else {
-            stripped = encoded
-        }
-        guard let data = Data(base64Encoded: stripped, options: [.ignoreUnknownCharacters]) else {
-            throw ImageServiceError.decodingFailed
-        }
+        log("[slot \(slot)] GEN OK", "bytes=\(data.count)")
         guard let img = UIImage(data: data) else {
+            log("[slot \(slot)] DECODE FAIL", "bytes did not decode as UIImage")
             throw ImageServiceError.decodingFailed
         }
-        return (img, data)
+        return GenerationResult(image: img, data: data, filename: "\(id.uuidString).png")
     }
 }
 

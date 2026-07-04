@@ -1,0 +1,11 @@
+/* Required: ComposeViewport sizes its surface to <body>, so the page must be
+   full-height or the whole screen collapses (only the bottom-pinned button
+   shows). Mirrors the femi webApp's styles.css. */
+html, body {
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    background: #000;
+}

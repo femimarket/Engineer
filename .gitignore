@@ -5,3 +5,10 @@ build/
 xcuserdata/
 *.xcuserdatad/
 .DS_Store
+.idea/
+
+# Kotlin / Gradle (Kmp subproject)
+.gradle
+.kotlin
+local.properties
+node_modules/

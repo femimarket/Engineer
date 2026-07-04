@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- The Engineer screen talks to the femi.market backend through the Api
+         Rust FFI; merged into every consumer of this library. -->
+    <uses-permission android:name="android.permission.INTERNET" />
+
+</manifest>

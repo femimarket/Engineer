@@ -2,17 +2,24 @@
 //  ImageIterate2App.swift
 //  ImageIterate2
 //
-//  Created by u on 13/06/2026.
-//
 
 import SwiftUI
 
 @main
 struct ImageIterate2App: App {
-    /// Demo bearer used by this sample app. Real apps consuming the
-    /// `ContentView` library MUST source their bearer from Keychain or a
-    /// server-issued session — never from a literal in source.
-    static let demoBearer = "019ec07a-c943-7275-b758-2315b8c9fa6f"
+    /// Demo credentials sourced from process args: `-u <user> -p <password>`.
+    /// Set them in the Xcode scheme (Edit Scheme → Run → Arguments → Arguments
+    /// Passed On Launch). Missing flags crash on launch.
+    static var demoUser: String { requireArg("-u") }
+    static var demoPassword: String { requireArg("-p") }
+
+    private static func requireArg(_ flag: String) -> String {
+        let args = CommandLine.arguments
+        guard let idx = args.firstIndex(of: flag), idx + 1 < args.count else {
+            preconditionFailure("Missing required launch argument \(flag). Set it in Edit Scheme → Run → Arguments.")
+        }
+        return args[idx + 1]
+    }
 
     /// Disk path of the bundled demo PNG. Its basename happens to match a
     /// real asset on femi.market, so the first generation can reference it.
@@ -27,7 +34,8 @@ struct ImageIterate2App: App {
         WindowGroup {
             ContentView(
                 initialImagePath: Self.demoImagePath,
-                bearer: Self.demoBearer,
+                user: Self.demoUser,
+                password: Self.demoPassword,
                 onCommit: { _, _ in }
             )
         }
@@ -37,7 +45,8 @@ struct ImageIterate2App: App {
 #Preview {
     ContentView(
         initialImagePath: ImageIterate2App.demoImagePath,
-        bearer: ImageIterate2App.demoBearer,
+        user: "preview",
+        password: "preview",
         onCommit: { _, _ in }
     )
 }
