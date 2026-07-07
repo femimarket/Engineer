@@ -23,7 +23,7 @@ class MainActivity : ComponentActivity() {
             navigationBarStyle = SystemBarStyle.dark(android.graphics.Color.TRANSPARENT),
         )
         setContent {
-            ContentView(user = "019ec07a-c943-7275-b758-2315b8c9fa6f", password = "")
+            ContentView(user = "019ec07a-c943-7275-b758-2315b8c9fa6f", password = "jkjk")
         }
     }
 }

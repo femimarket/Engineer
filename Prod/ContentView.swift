@@ -10,7 +10,6 @@
 import SwiftUI
 import UIKit
 import Api
-import ProjectService
 
 // MARK: - Models
 
@@ -179,13 +178,11 @@ private enum Store {
 // `UIImage(data:)` can't decode the result downstream.
 
 enum ImageServiceError: LocalizedError {
-    case localReadFailed(String)
     case decodingFailed
 
     var errorDescription: String? {
         switch self {
-        case .localReadFailed(let s): return s
-        case .decodingFailed:         return "couldn't read result"
+        case .decodingFailed: return "couldn't read result"
         }
     }
 }
@@ -209,13 +206,9 @@ final class ImageService: @unchecked Sendable {
         prompt: String,
         characterFilename: String,
         targetFilename: String
-    ) async throws -> (data: Data, serverFilename: String) {
-        let characterURL = ProjectService.getUrl(for: characterFilename)
-        let targetURL = ProjectService.getUrl(for: targetFilename)
-        guard let characterData = try? Data(contentsOf: characterURL),
-              let targetData = try? Data(contentsOf: targetURL) else {
-            throw ImageServiceError.localReadFailed("couldn't read cast reference bytes")
-        }
+    ) async -> (data: Data, serverFilename: String) {
+        let characterData = try! Data(contentsOf: ProjectService.getUrl(for: characterFilename))
+        let targetData = try! Data(contentsOf: ProjectService.getUrl(for: targetFilename))
         let result = await Api.flux2KleinI2I(
             user: user,
             password: password,
@@ -229,7 +222,7 @@ final class ImageService: @unchecked Sendable {
     /// Chat synthesis via Qwen. Runs on every Generate regardless of mode —
     /// Engineer treats synthesis as universal. Returns the last assistant
     /// message; falls back to the original idea if the model returned nothing.
-    func chatSynthesize(idea: String) async throws -> String {
+    func chatSynthesize(idea: String) async -> String {
         let userIdea = idea.isEmpty ? "Surprise me — generate something interesting." : idea
         let synthesizerRequest = """
             Make image prompt frame for Flux2. Reply with only the prompt, nothing else.
@@ -247,9 +240,25 @@ final class ImageService: @unchecked Sendable {
         return userIdea
     }
 
+    /// Edit mode: single reference image + prompt → Flux2DevI2I. Caller
+    /// supplies a pre-synthesized prompt.
+    func editGenerate(
+        prompt: String,
+        editFilename: String
+    ) async -> (data: Data, serverFilename: String) {
+        let editData = try! Data(contentsOf: ProjectService.getUrl(for: editFilename))
+        let result = await Api.flux2DevI2I(
+            user: user,
+            password: password,
+            image: editData,
+            prompt: prompt
+        )
+        return (result, "\(UUID().uuidString).png")
+    }
+
     /// Default text-to-image via Flux2Pro. Caller supplies a pre-synthesized
     /// prompt.
-    func generate(prompt: String) async throws -> (Data, String) {
+    func generate(prompt: String) async -> (Data, String) {
         let result = await Api.flux2Pro(
             user: user,
             password: password,
@@ -1122,19 +1131,25 @@ public struct ContentView: View {
         let task = Task { @MainActor in
             defer { inflight.removeValue(forKey: runId) }
             do {
-                let synthesized = try await ImageService.shared.chatSynthesize(idea: idea)
+                let synthesized = await ImageService.shared.chatSynthesize(idea: idea)
                 try Task.checkCancellation()
                 let data: Data
                 let modelName: String
                 if let (character, target) = ProjectService.getCharacterCast() {
-                    (data, _) = try await ImageService.shared.castGenerate(
+                    (data, _) = await ImageService.shared.castGenerate(
                         prompt: synthesized,
                         characterFilename: character,
                         targetFilename: target
                     )
                     modelName = "Flux2KleinI2I"
+                } else if let edit = ProjectService.getImageEdit() {
+                    (data, _) = await ImageService.shared.editGenerate(
+                        prompt: synthesized,
+                        editFilename: edit
+                    )
+                    modelName = "Flux2DevI2I"
                 } else {
-                    (data, _) = try await ImageService.shared.generate(prompt: synthesized)
+                    (data, _) = await ImageService.shared.generate(prompt: synthesized)
                     modelName = "Flux2Pro"
                 }
                 try Task.checkCancellation()

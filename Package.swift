@@ -22,7 +22,6 @@ let package = Package(
     ],
     dependencies: [
         .package(url: "https://github.com/femimarket/swiftapi", branch: "main"),
-        .package(url: "https://github.com/femimarket/swift-project-service", branch: "main"),
     ],
     targets: [
         .target(
@@ -45,7 +44,6 @@ let package = Package(
             name: "Prod",
             dependencies: [
                 .product(name: "Api", package: "swiftapi"),
-                .product(name: "ProjectService", package: "swift-project-service"),
             ],
             path: "Prod",
             exclude: [

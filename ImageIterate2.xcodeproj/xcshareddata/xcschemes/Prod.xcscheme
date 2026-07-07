@@ -53,7 +53,7 @@
       </BuildableProductRunnable>
       <CommandLineArguments>
          <CommandLineArgument
-            argument = "-u femimarket"
+            argument = "-u femimarket0000"
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
