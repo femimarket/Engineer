@@ -21,13 +21,13 @@ let package = Package(
         ),
     ],
     dependencies: [
-        .package(url: "https://github.com/femimarket/swiftapi", branch: "main"),
+        .package(url: "https://github.com/femimarket/api", branch: "main"),
     ],
     targets: [
         .target(
             name: "ImageIterate2",
             dependencies: [
-                .product(name: "Api", package: "swiftapi"),
+                .product(name: "Api", package: "api"),
             ],
             path: "ImageIterate2",
             exclude: [
@@ -43,7 +43,7 @@ let package = Package(
         .target(
             name: "Prod",
             dependencies: [
-                .product(name: "Api", package: "swiftapi"),
+                .product(name: "Api", package: "api"),
             ],
             path: "Prod",
             exclude: [
@@ -55,7 +55,7 @@ let package = Package(
             name: "ProdTests",
             dependencies: [
                 "Prod",
-                .product(name: "Api", package: "swiftapi"),
+                .product(name: "Api", package: "api"),
             ],
             path: "Tests/ProdTests"
         ),

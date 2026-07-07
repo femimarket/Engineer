@@ -9,9 +9,8 @@
 /* Begin PBXBuildFile section */
 		1425D1DF2FF3E5B3004F8F00 /* ImageIterate2.app in Resources */ = {isa = PBXBuildFile; fileRef = 14F0D4422FDD6B1400ABD6BB /* ImageIterate2.app */; };
 		1425D1E22FF3E5B8004F8F00 /* Playground.app in Resources */ = {isa = PBXBuildFile; fileRef = 1475AB112FDF041C00C86271 /* Playground.app */; };
-		1428D74E2FFAA17D00ACF110 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 1428D74D2FFAA17D00ACF110 /* Api */; };
-		1428D7502FFAA18A00ACF110 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 1428D74F2FFAA18A00ACF110 /* Api */; };
-		14D998982FE5A745002C5CF6 /* ProjectService in Frameworks */ = {isa = PBXBuildFile; productRef = 14D998972FE5A745002C5CF6 /* ProjectService */; };
+		1428F1C32FFD281200ACF110 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 1428F1C22FFD281200ACF110 /* Api */; };
+		1428F1C52FFD281800ACF110 /* Api in Frameworks */ = {isa = PBXBuildFile; productRef = 1428F1C42FFD281800ACF110 /* Api */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -67,7 +66,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				1428D7502FFAA18A00ACF110 /* Api in Frameworks */,
+				1428F1C52FFD281800ACF110 /* Api in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -75,8 +74,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				14D998982FE5A745002C5CF6 /* ProjectService in Frameworks */,
-				1428D74E2FFAA17D00ACF110 /* Api in Frameworks */,
+				1428F1C32FFD281200ACF110 /* Api in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -153,7 +151,7 @@
 			);
 			name = ImageIterate2;
 			packageProductDependencies = (
-				1428D74F2FFAA18A00ACF110 /* Api */,
+				1428F1C42FFD281800ACF110 /* Api */,
 			);
 			productName = ImageIterate2;
 			productReference = 14F0D4422FDD6B1400ABD6BB /* ImageIterate2.app */;
@@ -178,8 +176,7 @@
 			);
 			name = Prod;
 			packageProductDependencies = (
-				14D998972FE5A745002C5CF6 /* ProjectService */,
-				1428D74D2FFAA17D00ACF110 /* Api */,
+				1428F1C22FFD281200ACF110 /* Api */,
 			);
 			productName = Prod;
 			productReference = 14F0D61C2FDF5711005DEEA5 /* Prod.app */;
@@ -216,8 +213,7 @@
 			mainGroup = 14F0D4392FDD6B1400ABD6BB;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				14D998962FE5A745002C5CF6 /* XCRemoteSwiftPackageReference "swift-project-service" */,
-				1428D74C2FFAA17D00ACF110 /* XCRemoteSwiftPackageReference "api" */,
+				1428F1C12FFD281200ACF110 /* XCRemoteSwiftPackageReference "api" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 14F0D4432FDD6B1400ABD6BB /* Products */;
@@ -650,17 +646,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		1428D74C2FFAA17D00ACF110 /* XCRemoteSwiftPackageReference "api" */ = {
+		1428F1C12FFD281200ACF110 /* XCRemoteSwiftPackageReference "api" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/femimarket/api";
-			requirement = {
-				branch = main;
-				kind = branch;
-			};
-		};
-		14D998962FE5A745002C5CF6 /* XCRemoteSwiftPackageReference "swift-project-service" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/femimarket/swift-project-service";
 			requirement = {
 				branch = main;
 				kind = branch;
@@ -669,20 +657,15 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		1428D74D2FFAA17D00ACF110 /* Api */ = {
+		1428F1C22FFD281200ACF110 /* Api */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1428D74C2FFAA17D00ACF110 /* XCRemoteSwiftPackageReference "api" */;
+			package = 1428F1C12FFD281200ACF110 /* XCRemoteSwiftPackageReference "api" */;
 			productName = Api;
 		};
-		1428D74F2FFAA18A00ACF110 /* Api */ = {
+		1428F1C42FFD281800ACF110 /* Api */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 1428D74C2FFAA17D00ACF110 /* XCRemoteSwiftPackageReference "api" */;
+			package = 1428F1C12FFD281200ACF110 /* XCRemoteSwiftPackageReference "api" */;
 			productName = Api;
-		};
-		14D998972FE5A745002C5CF6 /* ProjectService */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 14D998962FE5A745002C5CF6 /* XCRemoteSwiftPackageReference "swift-project-service" */;
-			productName = ProjectService;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
